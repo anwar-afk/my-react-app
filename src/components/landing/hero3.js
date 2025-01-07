@@ -2,7 +2,7 @@ import React from 'react';
 
 const Hero = () => {
   return (
-    <div className="flex flex-col lg:flex-row items-center justify-between px-40 py-20 bg-gray-100 mb-10">
+    <div className="flex flex-col lg:flex-row items-center justify-between px-40 py-20 bg-white mb-10">
       {/* Text Section */}
       <div className="text-center lg:text-left max-w-lg lg:max-w-xl">
         <h1 className="text-4xl font-bold text-gray-800 mb-4">

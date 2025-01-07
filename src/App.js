@@ -4,6 +4,7 @@ import Hero from './components/landing/hero';
 import ProgramKerja from './components/landing/ProgramKerja';
 import Hero2 from './components/landing/hero2';
 import Hero3 from './components/landing/hero3';
+import Footer from './components/footer';
 
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
       <Hero2 />
       <Hero3 />
       <ProgramKerja />
+      <Footer />
     </div>
   );
 }
