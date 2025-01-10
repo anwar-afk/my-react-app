@@ -2,7 +2,7 @@ import React from 'react';
 
 const Summary = () => {
   return (
-    <div className="bg-gray-100 px-10 lg:px-40 py-20 flex flex-col lg:flex-row items-center lg:justify-between">
+    <div className="bg-green-100 px-10 lg:px-40 py-20 flex flex-col lg:flex-row items-center lg:justify-between">
       {/* Left Section (Text) */}
       <div className="lg:max-w-md mb-10 lg:mb-0">
         <h2 className="text-3xl font-bold text-gray-800">

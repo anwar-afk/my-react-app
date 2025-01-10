@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
   return (
@@ -6,7 +7,7 @@ const Navbar = () => {
       {/* Logo Section */}
       <div className="flex items-center space-x-2">
         <img
-          src="/logo.svg" // Ganti dengan path logo Anda
+          src="/logo.svg"
           alt="Yayasan Pelita Ilmu"
           className="h-8 w-8"
         />
@@ -18,24 +19,24 @@ const Navbar = () => {
 
       {/* Navigation Links */}
       <div className="hidden md:flex space-x-8">
-        <a href="#home" className="text-gray-800 hover:text-green-500">
+        <Link to="/" className="text-gray-800 hover:text-green-500">
           Home
-        </a>
-        <a href="#donasi" className="text-gray-800 hover:text-green-500">
+        </Link>
+        <Link to="/donasi" className="text-gray-800 hover:text-green-500">
           Donasi
-        </a>
-        <a href="#dokumentasi" className="text-gray-800 hover:text-green-500">
+        </Link>
+        <Link to="/dokumentasi" className="text-gray-800 hover:text-green-500">
           Dokumentasi
-        </a>
-        <a href="#laporan" className="text-gray-800 hover:text-green-500">
+        </Link>
+        <Link to="/laporan" className="text-gray-800 hover:text-green-500">
           Laporan
-        </a>
-        <a href="#faq" className="text-gray-800 hover:text-green-500">
+        </Link>
+        <Link to="/faq" className="text-gray-800 hover:text-green-500">
           Faq
-        </a>
-        <a href="#tentang" className="text-gray-800 hover:text-green-500">
+        </Link>
+        <Link to="/tentang" className="text-gray-800 hover:text-green-500">
           Tentang
-        </a>
+        </Link>
       </div>
 
       {/* Authentication Buttons */}
