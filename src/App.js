@@ -11,6 +11,9 @@ import DonasiPage from './pages/DonasiPage';
 import AboutPage from './pages/AboutPage';
 import DokumentasiPage from './pages/DokumentasiPages';
 import { useScrollReveal } from './hooks/useScrollReveal';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import { AuthProvider } from './context/AuthContext';
 
 // Komponen Home terpisah
 const Home = () => {
@@ -34,18 +37,22 @@ const Home = () => {
 
 function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-white">
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/donasi" element={<DonasiPage />} />
-          <Route path="/tentang" element={<AboutPage />} />
-          <Route path="/dokumentasi" element={<DokumentasiPage />} />
-        </Routes>
-        <Footer />
-      </div>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <div className="min-h-screen bg-white">
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/donasi" element={<DonasiPage />} />
+            <Route path="/tentang" element={<AboutPage />} />
+            <Route path="/dokumentasi" element={<DokumentasiPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+          </Routes>
+          <Footer />
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 

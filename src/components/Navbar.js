@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const Navbar = () => {
   return (
-    <nav className="flex items-center justify-between px-36 py-4 bg-white border-b border-gray-200 drop-shadow-lg relative z-50">
+    <nav className="flex items-center justify-between px-10 lg:px-36 py-4 bg-white border-b border-gray-200 drop-shadow-lg relative z-50">
       {/* Logo Section */}
       <div className="flex items-center space-x-2">
         <img
@@ -17,8 +17,8 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Navigation Links */}
-      <div className="hidden md:flex space-x-8">
+      {/* Navigation Links - Centered */}
+      <div className="flex items-center justify-center flex-1 space-x-8">
         <Link to="/" className="text-gray-800 hover:text-green-500">
           Home
         </Link>
@@ -39,12 +39,20 @@ const Navbar = () => {
         </Link>
       </div>
 
-      {/* Authentication Buttons */}
+      {/* Auth Buttons - Right */}
       <div className="flex items-center space-x-4">
-        <button className="text-green-500 hover:text-green-700">Login</button>
-        <button className="px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600">
-          Sign up
-        </button>
+        <Link 
+          to="/login"
+          className="text-green-500 hover:text-green-600 font-medium"
+        >
+          Login
+        </Link>
+        <Link
+          to="/register"
+          className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-300"
+        >
+          Sign Up
+        </Link>
       </div>
     </nav>
   );
