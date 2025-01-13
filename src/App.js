@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import './App.css';
 import Navbar from './components/Navbar';
 import Hero from './components/landing/hero';
@@ -36,24 +36,33 @@ const Home = () => {
 };
 
 function App() {
+  const location = useLocation();
+  const isLoginOrRegister = location.pathname === '/login' || location.pathname === '/register';
+
   return (
     <AuthProvider>
-      <Router>
-        <div className="min-h-screen bg-white">
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/donasi" element={<DonasiPage />} />
-            <Route path="/tentang" element={<AboutPage />} />
-            <Route path="/dokumentasi" element={<DokumentasiPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-          </Routes>
-          <Footer />
-        </div>
-      </Router>
+      <div className="min-h-screen bg-white">
+        {!isLoginOrRegister && <Navbar />}
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/donasi" element={<DonasiPage />} />
+          <Route path="/tentang" element={<AboutPage />} />
+          <Route path="/dokumentasi" element={<DokumentasiPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+        </Routes>
+        {!isLoginOrRegister && <Footer />}
+      </div>
     </AuthProvider>
   );
 }
 
-export default App;
+function AppWrapper() {
+  return (
+    <Router>
+      <App />
+    </Router>
+  );
+}
+
+export default AppWrapper;

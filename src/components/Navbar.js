@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 
 const Navbar = () => {
+  const { user, logout } = useContext(AuthContext);
+
   return (
     <nav className="flex items-center justify-between px-10 lg:px-36 py-4 bg-white border-b border-gray-200 drop-shadow-lg relative z-50">
       {/* Logo Section */}
@@ -41,18 +44,32 @@ const Navbar = () => {
 
       {/* Auth Buttons - Right */}
       <div className="flex items-center space-x-4">
-        <Link 
-          to="/login"
-          className="text-green-500 hover:text-green-600 font-medium"
-        >
-          Login
-        </Link>
-        <Link
-          to="/register"
-          className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-300"
-        >
-          Sign Up
-        </Link>
+        {user ? (
+          <div className="flex items-center space-x-4">
+            <span className="text-gray-800">{user.username}</span>
+            <button
+              onClick={logout}
+              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-300"
+            >
+              Logout
+            </button>
+          </div>
+        ) : (
+          <>
+            <Link 
+              to="/login"
+              className="text-green-500 hover:text-green-600 font-medium"
+            >
+              Login
+            </Link>
+            <Link
+              to="/register"
+              className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-300"
+            >
+              Sign Up
+            </Link>
+          </>
+        )}
       </div>
     </nav>
   );
