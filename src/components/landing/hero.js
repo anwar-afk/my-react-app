@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom'; // Import Link dari react-router-dom
 import { getCampaigns } from '../../services/campaignService';
 
 // Komponen Hero Pertama
@@ -163,7 +164,11 @@ const ProgramKerja = () => {
       {/* Program Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
         {campaigns.map((campaign) => (
-          <div key={campaign._id} className="bg-white shadow-lg rounded-lg overflow-hidden">
+          <Link
+            to={`/donation/${campaign._id}`} // Navigasi ke halaman detail dengan ID campaign
+            key={campaign._id}
+            className="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+          >
             <img
               src={campaign.image}
               alt={campaign.title}
@@ -180,14 +185,11 @@ const ProgramKerja = () => {
                   Terkumpul: Rp {campaign.currentAmount.toLocaleString()}
                 </span>
               </div>
-              <a
-                href={`/campaign/${campaign._id}`}
-                className="text-green-500 font-medium hover:underline flex items-center mt-4"
-              >
+              <div className="text-green-500 font-medium hover:underline flex items-center mt-4">
                 Readmore <span className="ml-2">→</span>
-              </a>
+              </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>
