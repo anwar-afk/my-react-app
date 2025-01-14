@@ -4,6 +4,13 @@ import { getCampaigns } from "../../services/campaignService";
 
 // Komponen Header (Donasi)
 export const DonasiHeader = () => {
+  const handleScrollToContent = () => {
+    const contentSection = document.getElementById("donasi-content");
+    if (contentSection) {
+      contentSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <div className="flex flex-col lg:flex-row items-center justify-between px-10 lg:px-60 py-20 bg-green-100">
       {/* Left Section */}
@@ -15,7 +22,10 @@ export const DonasiHeader = () => {
           Setiap donasi Anda adalah langkah kecil menuju perubahan besar.
           Bergabunglah dengan kami untuk membawa cahaya harapan bagi mereka yang membutuhkan.
         </p>
-        <button className="px-6 py-3 bg-green-500 text-white font-semibold rounded-full shadow-md hover:bg-green-600">
+        <button
+          onClick={handleScrollToContent}
+          className="px-6 py-3 bg-green-500 text-white font-semibold rounded-full shadow-md hover:bg-green-600"
+        >
           MAKE A DONATION
         </button>
       </div>
@@ -40,6 +50,7 @@ export const DonasiHeader = () => {
 export const DonasiContent = () => {
   const [campaigns, setCampaigns] = useState([]); // State untuk menyimpan data campaign
   const [selectedCategory, setSelectedCategory] = useState("all"); // State untuk menyimpan kategori yang dipilih
+  const [showAll, setShowAll] = useState(false); // State untuk kontrol "Lihat Lebih Banyak"
   const categories = ['bencana_alam', 'pendidikan', 'kesehatan', 'kemanusiaan', 'lingkungan', 'lainnya']; // Daftar kategori
 
   // Fetch data campaign dari API menggunakan campaign service
@@ -64,8 +75,10 @@ export const DonasiContent = () => {
     return isCategoryMatch && isActive;
   });
 
+  const visibleCampaigns = showAll ? filteredCampaigns : filteredCampaigns.slice(0, 4);
+
   return (
-    <div className="px-10 lg:px-40 py-20">
+    <div id="donasi-content" className="px-10 lg:px-40 py-20">
       <h1 className="text-5xl font-normal text-green-500 mb-10 mb-40 mt-20">
         Mari Bantu <span className="font-semibold">Mereka</span>
       </h1>
@@ -92,26 +105,26 @@ export const DonasiContent = () => {
       </div>
 
       {/* Donation Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-        {filteredCampaigns.length > 0 ? (
-          filteredCampaigns.map((campaign) => (
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+        {visibleCampaigns.length > 0 ? (
+          visibleCampaigns.map((campaign) => (
             <Link
               to={`/donation/${campaign._id}`}
               key={campaign._id}
-              className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
             >
               <img
                 src={campaign.image}
                 alt={campaign.title}
-                className="w-full h-48 object-cover"
+                className="w-full h-32 object-cover"
               />
-              <div className="p-6">
-                <span className="text-xs bg-green-100 text-green-600 font-medium px-2 py-1 rounded-full inline-block mb-4">
+              <div className="p-4">
+                <span className="text-xs bg-green-100 text-green-600 font-medium px-2 py-1 rounded-full inline-block mb-2">
                   {campaign.category}
                 </span>
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">{campaign.title}</h3>
+                <h3 className="text-md font-semibold text-gray-800 mb-2">{campaign.title}</h3>
                 <div className="text-green-500 font-medium hover:underline flex items-center">
-                  Lihat Selengkapnya <span className="ml-2">→</span>
+                  Lihat Selengkapnya <span className="ml-1">→</span>
                 </div>
               </div>
             </Link>
@@ -121,11 +134,16 @@ export const DonasiContent = () => {
         )}
       </div>
       {/* Button Section */}
-      <div className="">
-        <button className="flex item-center mt-20 mb-20 px-6 py-3 bg-green-500 text-white rounded-lg font-semibold shadow-md hover:bg-green-600 transition">
-          Lihat Lebih Banyak
-        </button>
-      </div>
+      {filteredCampaigns.length > 4 && (
+        <div className="flex justify-center mt-10">
+          <button
+            onClick={() => setShowAll(!showAll)}
+            className="px-4 py-2 bg-green-500 text-white rounded-lg font-semibold shadow-md hover:bg-green-600 transition"
+          >
+            {showAll ? "Tampilkan Lebih Sedikit" : "Lihat Lebih Banyak"}
+          </button>
+        </div>
+      )}
     </div>
   );
 };
@@ -140,4 +158,4 @@ const Donasi = () => {
   );
 };
 
-export default Donasi; // Default export untuk komponen utama
+export default Donasi;

@@ -23,13 +23,22 @@ const ProgramKerja = () => {
     <div className="px-10 lg:px-40 py-20 bg-white">
       {/* Header */}
       <div className="text-center mb-10 max-w-2xl mx-auto">
-        <h2 className="text-3xl font-bold text-gray-800 mb-2">Tentang Kami</h2>
-        <p className="text-gray-600 whitespace-normal break-words">
-          The Nexcent blog is the best place to read about the latest membership insights,
-          trends and more. See who's joining the community, read about how our community 
-          are increasing their membership income and lot's more.
-        </p>
-      </div>
+  <div className="bg-green-50 rounded-lg shadow-lg p-6 mb-20">
+    <h2 className="text-3xl font-bold text-gray-800 mb-4">Tentang Kami</h2>
+    <p className="text-gray-600 whitespace-normal break-words">
+      Kami adalah sebuah yayasan yang berkomitmen menjadi cahaya harapan bagi mereka yang membutuhkan. 
+      Dengan penuh cinta dan keikhlasan, kami hadir untuk membantu anak-anak yatim, kaum dhuafa, dan 
+      orang-orang yang sedang berjuang melawan keterbatasan.
+
+      Di setiap langkah, kami percaya bahwa berbagi adalah kunci kebahagiaan sejati. Setiap donasi yang Anda 
+      salurkan adalah setetes harapan yang mampu mengubah masa depan mereka yang membutuhkan. Mari bersama-sama 
+      menciptakan dunia yang lebih peduli, di mana senyuman mereka adalah kebahagiaan kita semua. 🌟
+
+      Bersama, kita wujudkan kehidupan yang lebih baik untuk mereka yang membutuhkan.
+    </p>
+  </div>
+</div>
+
 
       {/* Program Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">

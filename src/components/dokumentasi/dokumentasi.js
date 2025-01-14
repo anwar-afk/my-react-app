@@ -1,11 +1,12 @@
 import React from "react";
+import { useSpring, animated } from "@react-spring/web";
 
 const Album = () => {
   const currentDate = new Date();
   const maxYear = currentDate.getFullYear();
   const [currentYear, setCurrentYear] = React.useState(2025);
   const [currentMonth, setCurrentMonth] = React.useState(currentDate.getMonth());
-  
+
   const months = [
     "Januari", "Februari", "Maret", "April", "Mei", "Juni",
     "Juli", "Agustus", "September", "Oktober", "November", "Desember"
@@ -49,7 +50,7 @@ const Album = () => {
     {
       id: 1,
       location: "Mississauga, Ontario",
-      image: "/images/album-image.png", // Ganti dengan nama file Anda
+      image: "/images/album-image.png",
       title: "Title Text",
       description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore...",
       date: "Jan 31",
@@ -57,7 +58,7 @@ const Album = () => {
     {
       id: 2,
       location: "London, UK",
-      image: "/images/album-image.png", // Ganti dengan nama file Anda
+      image: "/images/album-image.png",
       title: "Title Text",
       description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore...",
       date: "Jan 31",
@@ -65,15 +66,21 @@ const Album = () => {
     {
       id: 3,
       location: "Lausanne, Switzerland",
-      image: "/images/album-image.png", // Ganti dengan nama file Anda
+      image: "/images/album-image.png",
       title: "Title Text",
       description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore...",
       date: "Jan 31",
     },
   ];
 
+  const fadeProps = useSpring({
+    from: { opacity: 0 },
+    to: { opacity: 1 },
+    config: { duration: 1000 },
+  });
+
   return (
-    <div className="bg-white text-gray-800 min-h-screen px-10 lg:px-40 py-16">
+    <animated.div style={fadeProps} className="bg-white text-gray-800 min-h-screen px-10 lg:px-40 py-16">
       {/* Header */}
       <div className="border-b border-gray-300 pb-6">
         <h1 className="text-3xl font-bold mb-2">Dokumentasi</h1>
@@ -170,7 +177,7 @@ const Album = () => {
           Lihat Lebih Banyak
         </button>
       </div>
-    </div>
+    </animated.div>
   );
 };
 
