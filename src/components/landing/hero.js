@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom'; // Import Link dari react-router-dom
-import { useSpring, animated } from '@react-spring/web';
+import { Link } from 'react-router-dom';
+import { useSpring, animated, useInView } from '@react-spring/web';
 import { getCampaigns } from '../../services/campaignService';
 
 function FadeInComponent({ children }) {
+  const [ref, inView] = useInView({ threshold: 0.2 });
   const styles = useSpring({
-    from: { opacity: 0 }, // Animasi dimulai dengan opasitas 0
-    to: { opacity: 1 },   // Opasitas berubah menjadi 1
-    config: { duration: 1000 }, // Durasi animasi 1 detik
+    opacity: inView ? 1 : 0,
+    transform: inView ? 'translateY(0)' : 'translateY(20px)',
+    config: { duration: 1000 },
   });
 
-  return <animated.div style={styles}>{children}</animated.div>;
+  return (
+    <animated.div ref={ref} style={styles}>
+      {children}
+    </animated.div>
+  );
 }
 
 // Komponen Hero Pertama
@@ -18,7 +23,6 @@ const Hero1 = () => {
   return (
     <FadeInComponent>
       <div className="flex flex-col lg:flex-row items-center justify-between px-10 lg:px-40 py-20 bg-white">
-        {/* Image Section */}
         <div className="lg:max-w-lg">
           <img
             src="/image/hero2.png"
@@ -27,7 +31,6 @@ const Hero1 = () => {
           />
         </div>
 
-        {/* Text Section */}
         <div className="mt-10 lg:mt-0 lg:max-w-2xl">
           <h1 className="text-4xl font-bold text-gray-800 mb-6 hover:text-green-500 transition-colors duration-300">
             Lorem ipsum dolor sit amet, <br /> consectetur adipiscing elit.
@@ -35,9 +38,7 @@ const Hero1 = () => {
           <p className="text-gray-600 text-lg mb-8 leading-relaxed">
             Donec a eros justo. Fusce egestas tristique ultrices. Nam tempor,
             augue nec tincidunt molestie, massa nunc varius arcu, et scelerisque
-            elit erat a magna. Donec quis erat at libero ultrices mollis. In hac
-            habitasse platea dictumst. Vivamus vehicula leo dui, at porta nisi
-            facilisis finibus.
+            elit erat a magna.
           </p>
           <button className="px-6 py-3 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
             Donasi disini
@@ -51,55 +52,59 @@ const Hero1 = () => {
 // Komponen Summary
 const Summary = () => {
   return (
-    <div className="bg-green-100 px-10 lg:px-40 py-20 flex flex-col lg:flex-row items-center lg:justify-between">
-      <div className="lg:max-w-md mb-10 lg:mb-0">
-        <h2 className="text-3xl font-bold text-gray-800">
-          Bantu Donasi <br />
-          <span className="text-green-500">Yayasan Kami</span>
-        </h2>
-        <p className="text-gray-600 text-lg mt-2">
-          We reached here with our hard work and dedication
-        </p>
-      </div>
-      <div className="flex flex-col lg:flex-row items-center lg:space-x-10">
-        <div className="flex items-center space-x-4">
-          <img src="/image/ic-hero3.svg" alt="Donatur Icon" />
-          <div>
-            <p className="text-3xl font-bold text-gray-800">2,245,341</p>
-            <p className="text-gray-600">Donatur</p>
+    <FadeInComponent>
+      <div className="bg-green-100 px-10 lg:px-40 py-20 flex flex-col lg:flex-row items-center lg:justify-between">
+        <div className="lg:max-w-md mb-10 lg:mb-0">
+          <h2 className="text-3xl font-bold text-gray-800">
+            Bantu Donasi <br />
+            <span className="text-green-500">Yayasan Kami</span>
+          </h2>
+          <p className="text-gray-600 text-lg mt-2">
+            We reached here with our hard work and dedication
+          </p>
+        </div>
+        <div className="flex flex-col lg:flex-row items-center lg:space-x-10">
+          <div className="flex items-center space-x-4">
+            <img src="/image/ic-hero3.svg" alt="Donatur Icon" />
+            <div>
+              <p className="text-3xl font-bold text-gray-800">2,245,341</p>
+              <p className="text-gray-600">Donatur</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-4 mt-8 lg:mt-0">
+            <img src="/image/hand-ic-hero3.svg" alt="Komunitas Icon" />
+            <div>
+              <p className="text-3xl font-bold text-gray-800">46,328</p>
+              <p className="text-gray-600">Komunitas</p>
+            </div>
           </div>
         </div>
-        <div className="flex items-center space-x-4 mt-8 lg:mt-0">
-          <img src="/image/hand-ic-hero3.svg" alt="Komunitas Icon" />
-          <div>
-            <p className="text-3xl font-bold text-gray-800">46,328</p>
-            <p className="text-gray-600">Komunitas</p>
-          </div>
-        </div>
       </div>
-    </div>
+    </FadeInComponent>
   );
 };
 
 // Komponen Hero Kedua
 const Hero2 = () => {
   return (
-    <div className="flex flex-col lg:flex-row items-center justify-between px-40 py-20 bg-white mb-10">
-      <div className="text-center lg:text-left max-w-lg lg:max-w-xl">
-        <h1 className="text-4xl font-bold text-gray-800 mb-4">
-          Bersama untuk Masa Depan, <span className="text-green-500">ahay.</span>
-        </h1>
-        <p className="text-gray-600 text-lg mb-6">
-          Where to grow your business as a photographer: site or social media?
-        </p>
-        <button className="px-6 py-3 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600">
-          Register
-        </button>
+    <FadeInComponent>
+      <div className="flex flex-col lg:flex-row items-center justify-between px-40 py-20 bg-white mb-10">
+        <div className="text-center lg:text-left max-w-lg lg:max-w-xl">
+          <h1 className="text-4xl font-bold text-gray-800 mb-4">
+            Bersama untuk Masa Depan, <span className="text-green-500">ahay.</span>
+          </h1>
+          <p className="text-gray-600 text-lg mb-6">
+            Where to grow your business as a photographer: site or social media?
+          </p>
+          <button className="px-6 py-3 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600">
+            Register
+          </button>
+        </div>
+        <div className="mt-10 lg:mt-0 lg:max-w-md">
+          <img src="/image/hero.png" alt="Illustration" className="w-full" />
+        </div>
       </div>
-      <div className="mt-10 lg:mt-0 lg:max-w-md">
-        <img src="/image/hero.png" alt="Illustration" className="w-full" />
-      </div>
-    </div>
+    </FadeInComponent>
   );
 };
 
@@ -128,37 +133,39 @@ const ProgramKerja = () => {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="px-10 lg:px-40 py-20 bg-white">
-      <div className="text-center mb-10 max-w-2xl mx-auto">
-        <h2 className="text-3xl font-bold text-gray-800 mb-2">Program Kerja</h2>
-        <p className="text-gray-600">
-          The Nexcent blog is the best place to read about the latest membership insights.
-        </p>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-        {campaigns.map((campaign) => (
-          <Link
-            to={`/donation/${campaign._id}`}
-            key={campaign._id}
-            className="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
-          >
-            <img
-              src={campaign.image}
-              alt={campaign.title}
-              className="w-full h-48 object-cover rounded-t-lg"
-            />
-            <div className="p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">{campaign.title}</h3>
-              <p className="text-gray-600 mb-4">{campaign.detail}</p>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-500">Target: Rp {campaign.target.toLocaleString()}</span>
-                <span className="text-sm text-gray-500">Terkumpul: Rp {campaign.currentAmount.toLocaleString()}</span>
+    <FadeInComponent>
+      <div className="px-10 lg:px-40 py-20 bg-white">
+        <div className="text-center mb-10 max-w-2xl mx-auto">
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">Program Kerja</h2>
+          <p className="text-gray-600">
+            The Nexcent blog is the best place to read about the latest membership insights.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+          {campaigns.map((campaign) => (
+            <Link
+              to={`/donation/${campaign._id}`}
+              key={campaign._id}
+              className="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+            >
+              <img
+                src={campaign.image}
+                alt={campaign.title}
+                className="w-full h-48 object-cover rounded-t-lg"
+              />
+              <div className="p-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">{campaign.title}</h3>
+                <p className="text-gray-600 mb-4">{campaign.detail}</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-500">Target: Rp {campaign.target.toLocaleString()}</span>
+                  <span className="text-sm text-gray-500">Terkumpul: Rp {campaign.currentAmount.toLocaleString()}</span>
+                </div>
               </div>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          ))}
+        </div>
       </div>
-    </div>
+    </FadeInComponent>
   );
 };
 

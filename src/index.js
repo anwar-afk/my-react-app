@@ -1,5 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { BrowserRouter as Router } from 'react-router-dom'; // Import BrowserRouter
+import { AuthProvider } from './context/AuthContext'; // Import AuthProvider
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
@@ -7,7 +9,11 @@ import reportWebVitals from './reportWebVitals';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <Router> {/* Bungkus App dengan Router */}
+      <AuthProvider> {/* Bungkus App dengan AuthProvider */}
+        <App />
+      </AuthProvider>
+    </Router>
   </React.StrictMode>
 );
 

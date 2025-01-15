@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getCampaigns } from "../../services/campaignService";
+import { useSpring, animated } from "@react-spring/web";
+import { useInView } from "react-intersection-observer";
 
-// Komponen Header (Donasi)
+// Komponen Header (DonasiHeader)
 export const DonasiHeader = () => {
+  const { ref, inView } = useInView({ triggerOnce: true });
+  const headerAnimation = useSpring({
+    opacity: inView ? 1 : 0,
+    transform: inView ? "translateY(0px)" : "translateY(-50px)",
+  });
+
   const handleScrollToContent = () => {
     const contentSection = document.getElementById("donasi-content");
     if (contentSection) {
@@ -12,7 +20,11 @@ export const DonasiHeader = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row items-center justify-between px-10 lg:px-60 py-20 bg-green-100">
+    <animated.div
+      ref={ref}
+      style={headerAnimation}
+      className="flex flex-col lg:flex-row items-center justify-between px-10 lg:px-60 py-20 bg-green-100"
+    >
       {/* Left Section */}
       <div className="lg:max-w-lg text-center lg:text-left mb-10 lg:mb-0">
         <h1 className="text-4xl font-extrabold text-brown-800 mb-6">
@@ -32,7 +44,6 @@ export const DonasiHeader = () => {
 
       {/* Right Section */}
       <div className="relative">
-        {/* Image */}
         <img
           src="/image/child smiling.png" // Ganti dengan path gambar
           alt="Child Smiling"
@@ -42,23 +53,64 @@ export const DonasiHeader = () => {
           <div className="w-20 h-20 bg-green-400 rounded-full"></div>
         </div>
       </div>
-    </div>
+    </animated.div>
   );
 };
 
-// Komponen Konten Donasi (DonasiContent)
-export const DonasiContent = () => {
-  const [campaigns, setCampaigns] = useState([]); // State untuk menyimpan data campaign
-  const [selectedCategory, setSelectedCategory] = useState("all"); // State untuk menyimpan kategori yang dipilih
-  const [showAll, setShowAll] = useState(false); // State untuk kontrol "Lihat Lebih Banyak"
-  const categories = ['bencana_alam', 'pendidikan', 'kesehatan', 'kemanusiaan', 'lingkungan', 'lainnya']; // Daftar kategori
+// Single Campaign Card Component
+const CampaignCard = ({ campaign }) => {
+  const { ref, inView } = useInView({ triggerOnce: true });
+  const cardAnimation = useSpring({
+    opacity: inView ? 1 : 0,
+    transform: inView ? "translateY(0px)" : "translateY(50px)",
+  });
 
-  // Fetch data campaign dari API menggunakan campaign service
+  return (
+    <animated.div ref={ref} style={cardAnimation}>
+      <Link
+        to={`/donation/${campaign._id}`}
+        className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+      >
+        <img
+          src={campaign.image}
+          alt={campaign.title}
+          className="w-full h-32 object-cover"
+        />
+        <div className="p-4">
+          <span className="text-xs bg-green-100 text-green-600 font-medium px-2 py-1 rounded-full inline-block mb-2">
+            {campaign.category}
+          </span>
+          <h3 className="text-md font-semibold text-gray-800 mb-2">
+            {campaign.title}
+          </h3>
+          <div className="text-green-500 font-medium hover:underline flex items-center">
+            Lihat Selengkapnya <span className="ml-1">→</span>
+          </div>
+        </div>
+      </Link>
+    </animated.div>
+  );
+};
+
+// DonasiContent Component
+export const DonasiContent = () => {
+  const [campaigns, setCampaigns] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [showAll, setShowAll] = useState(false);
+  const categories = [
+    "bencana_alam",
+    "pendidikan",
+    "kesehatan",
+    "kemanusiaan",
+    "lingkungan",
+    "lainnya",
+  ];
+
   useEffect(() => {
     const fetchCampaigns = async () => {
       try {
-        const data = await getCampaigns(); // Menggunakan fungsi getCampaigns dari service
-        console.log("Fetched Campaigns:", data); // Periksa data yang di-fetch
+        const data = await getCampaigns();
+        console.log("Fetched Campaigns:", data);
         setCampaigns(data);
       } catch (error) {
         console.error("Error fetching campaigns:", error);
@@ -68,10 +120,9 @@ export const DonasiContent = () => {
     fetchCampaigns();
   }, []);
 
-  // Filter campaign berdasarkan kategori dan endDate
   const filteredCampaigns = campaigns.filter((campaign) => {
     const isCategoryMatch = selectedCategory === "all" || campaign.category === selectedCategory;
-    const isActive = new Date(campaign.endDate) > new Date(); // Cek apakah campaign masih aktif
+    const isActive = new Date(campaign.endDate) > new Date();
     return isCategoryMatch && isActive;
   });
 
@@ -82,7 +133,6 @@ export const DonasiContent = () => {
       <h1 className="text-5xl font-normal text-green-500 mb-10 mb-40 mt-20">
         Mari Bantu <span className="font-semibold">Mereka</span>
       </h1>
-      {/* Title dan Filter Kategori */}
       <div className="flex justify-between items-center mb-10">
         <h2 className="text-3xl font-bold text-gray-800">Donasi</h2>
         <div className="flex space-x-4">
@@ -90,7 +140,7 @@ export const DonasiContent = () => {
             value={selectedCategory}
             onChange={(e) => {
               setSelectedCategory(e.target.value);
-              console.log("Selected Category:", e.target.value); // Periksa nilai yang dipilih
+              console.log("Selected Category:", e.target.value);
             }}
             className="px-4 py-2 border border-gray-300 rounded-lg"
           >
@@ -104,36 +154,15 @@ export const DonasiContent = () => {
         </div>
       </div>
 
-      {/* Donation Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
         {visibleCampaigns.length > 0 ? (
           visibleCampaigns.map((campaign) => (
-            <Link
-              to={`/donation/${campaign._id}`}
-              key={campaign._id}
-              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
-            >
-              <img
-                src={campaign.image}
-                alt={campaign.title}
-                className="w-full h-32 object-cover"
-              />
-              <div className="p-4">
-                <span className="text-xs bg-green-100 text-green-600 font-medium px-2 py-1 rounded-full inline-block mb-2">
-                  {campaign.category}
-                </span>
-                <h3 className="text-md font-semibold text-gray-800 mb-2">{campaign.title}</h3>
-                <div className="text-green-500 font-medium hover:underline flex items-center">
-                  Lihat Selengkapnya <span className="ml-1">→</span>
-                </div>
-              </div>
-            </Link>
+            <CampaignCard key={campaign._id} campaign={campaign} />
           ))
         ) : (
           <p className="text-gray-600">Tidak ada campaign yang tersedia.</p>
         )}
       </div>
-      {/* Button Section */}
       {filteredCampaigns.length > 4 && (
         <div className="flex justify-center mt-10">
           <button
@@ -148,12 +177,12 @@ export const DonasiContent = () => {
   );
 };
 
-// Komponen Utama yang Menggabungkan DonasiHeader dan DonasiContent
+// Main Donasi Component
 const Donasi = () => {
   return (
     <div>
-      <DonasiHeader /> {/* Tampilkan Header */}
-      <DonasiContent /> {/* Tampilkan Konten Donasi */}
+      <DonasiHeader />
+      <DonasiContent />
     </div>
   );
 };

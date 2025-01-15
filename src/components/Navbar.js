@@ -16,7 +16,7 @@ const Navbar = () => {
         />
         <div>
           <h1 className="text-lg font-bold text-gray-800">Yayasan</h1>
-          <p className="text-sm text-gray-600">Pelita Ilmu</p>
+          <p className="text-sm text-gray-600">Syakira Berkah</p>
         </div>
       </div>
 
