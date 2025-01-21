@@ -10,8 +10,10 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import LaporanPage from './pages/LaporanPage';
 import DonationDetailPage from './components/donasi/detail';
-import { AuthContext } from './context/AuthContext'; // Import AuthContext
+import AdminPage from './pages/AdminPage'; // Import halaman admin
+import { AuthContext } from './context/AuthContext';
 import { useScrollReveal } from './hooks/useScrollReveal';
+import RoleMiddleware from './middleware/RoleMiddleware'; // Import RoleMiddleware
 
 // Komponen Home terpisah
 const Home = () => {
@@ -27,9 +29,9 @@ const Home = () => {
 function App() {
   const location = useLocation();
   const isLoginOrRegister = location.pathname === '/login' || location.pathname === '/register';
-  const { updateLastInteraction } = useContext(AuthContext); // Gunakan useContext dengan benar
+  const isAdmin = location.pathname.startsWith('/admin'); // Cek apakah route adalah /admin
+  const { updateLastInteraction } = useContext(AuthContext);
 
-  // Pantau interaksi pengguna (klik, scroll, ketik)
   useEffect(() => {
     const handleUserInteraction = () => {
       updateLastInteraction();
@@ -48,8 +50,9 @@ function App() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Tampilkan Navbar hanya jika bukan halaman login atau register */}
-      {!isLoginOrRegister && <Navbar />}
+      {/* Tampilkan Navbar hanya jika bukan halaman login, register, atau admin */}
+      {!isLoginOrRegister && !isAdmin && <Navbar />}
+
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/donasi" element={<DonasiPage />} />
@@ -59,9 +62,18 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/donation/:id" element={<DonationDetailPage />} />
+        <Route
+          path="/admin"
+          element={
+            <RoleMiddleware requiredRole="admin">
+              <AdminPage />
+            </RoleMiddleware>
+          }
+        />
       </Routes>
-      {/* Tampilkan Footer hanya jika bukan halaman login atau register */}
-      {!isLoginOrRegister && <Footer />}
+
+      {/* Tampilkan Footer hanya jika bukan halaman login, register, atau admin */}
+      {!isLoginOrRegister && !isAdmin && <Footer />}
     </div>
   );
 }

@@ -4,19 +4,24 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [role, setRole] = useState(null); // Tambahkan state untuk role
   const [lastInteraction, setLastInteraction] = useState(Date.now());
 
   // Fungsi untuk login
   const login = (userData) => {
     setUser(userData);
-    setLastInteraction(Date.now()); // Set waktu terakhir interaksi
+    setRole(userData.role); // Simpan role dari userData
+    setLastInteraction(Date.now());
     localStorage.setItem('token', userData.token);
+    localStorage.setItem('role', userData.role); // Simpan role ke localStorage
   };
 
   // Fungsi untuk logout
   const logout = () => {
     setUser(null);
+    setRole(null); // Reset role saat logout
     localStorage.removeItem('token');
+    localStorage.removeItem('role'); // Hapus role dari localStorage
   };
 
   // Cek session timeout setiap 1 menit
@@ -39,8 +44,18 @@ export const AuthProvider = ({ children }) => {
     setLastInteraction(Date.now());
   };
 
+  // Cek token dan role saat komponen pertama kali di-mount
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+    if (token && role) {
+      setUser({ token });
+      setRole(role);
+    }
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, updateLastInteraction }}>
+    <AuthContext.Provider value={{ user, role, login, logout, updateLastInteraction }}>
       {children}
     </AuthContext.Provider>
   );

@@ -16,9 +16,18 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       const response = await login(formData);
+      console.log('Response from login:', response); // Debugging: Lihat response
       if (response.token) {
-        authLogin({ username: formData.email, token: response.token });
-        navigate('/');
+        authLogin({ 
+          username: formData.email, 
+          token: response.token, 
+          role: response.user.role // Ambil role dari response.user.role
+        });
+        if (response.user.role === 'admin') {
+          navigate('/admin'); // Arahkan ke halaman admin jika role adalah admin
+        } else {
+          navigate('/'); // Arahkan ke halaman utama jika role adalah user
+        }
       }
     } catch (err) {
       setError(err.message || 'Email atau password salah');

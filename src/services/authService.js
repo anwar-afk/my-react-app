@@ -16,9 +16,10 @@ export const login = async (credentials) => {
     const response = await axios.post(`${API_URL}/login`, credentials);
     if (response.data.token) {
       localStorage.setItem('token', response.data.token);
+      localStorage.setItem('role', response.data.user.role); // Simpan role dari response.user.role
     }
     return response.data;
   } catch (error) {
     throw error.response.data;
   }
-}; 
+};
