@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../context/AuthContext'; // Sesuaikan path sesuai struktur folder
+import { AuthContext } from '../../../context/AuthContext'; // Sesuaikan path sesuai struktur folder
 
 const Sidebar = () => {
   const { logout } = useContext(AuthContext); // Ambil fungsi logout dari AuthContext
@@ -15,6 +15,11 @@ const Sidebar = () => {
     <div className="bg-gray-800 text-white w-64 min-h-screen p-4 flex flex-col">
       <h1 className="text-2xl font-bold mb-6">Admin Panel</h1>
       <ul className="flex-1">
+        <li className="mb-3">
+          <Link to="/admin/dashboard" className="block p-2 hover:bg-gray-700 rounded">
+            Dashboard
+          </Link>
+        </li>
         <li className="mb-3">
           <Link to="/admin/program" className="block p-2 hover:bg-gray-700 rounded">
             Program

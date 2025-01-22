@@ -9,11 +9,12 @@ const CreateProgram = () => {
     startDate: '',
     endDate: '',
     target: '',
-    images: [],
+    images: [], // Menyimpan file gambar yang dipilih
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Fungsi untuk mengubah input teks
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -22,18 +23,24 @@ const CreateProgram = () => {
     });
   };
 
+  // Fungsi untuk mengubah input file (gambar)
   const handleFileChange = (e) => {
+    // Ambil semua file yang dipilih
+    const files = Array.from(e.target.files);
+    console.log('Files selected:', files); // Debugging: Cek file yang dipilih
     setFormData({
       ...formData,
-      images: e.target.files,
+      images: files, // Simpan file-file yang dipilih ke state
     });
   };
 
+  // Fungsi untuk mengirim data ke backend
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
+    // Buat objek FormData untuk mengirim file
     const data = new FormData();
     data.append('title', formData.title);
     data.append('detail', formData.detail);
@@ -42,23 +49,29 @@ const CreateProgram = () => {
     data.append('endDate', formData.endDate);
     data.append('target', formData.target);
 
-    for (let i = 0; i < formData.images.length; i++) {
-      data.append('images', formData.images[i]);
-    }
+    // Tambahkan semua file gambar ke FormData
+    formData.images.forEach((image, index) => {
+      data.append('images', image); // Gunakan 'images' sebagai key untuk backend
+    });
+
+    console.log('FormData to be sent:', data); // Debugging: Cek FormData sebelum dikirim
 
     try {
+      // Kirim data ke backend
       const response = await axios.post(
         'https://express-production-c596.up.railway.app/api/campaigns',
         data,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            'Content-Type': 'multipart/form-data', // Penting untuk mengirim file
           },
         }
       );
 
       console.log('Response:', response.data);
       alert('Program berhasil dibuat!');
+
+      // Reset form setelah berhasil
       setFormData({
         title: '',
         detail: '',
@@ -80,6 +93,7 @@ const CreateProgram = () => {
     <div className="flex-1 p-8">
       <h1 className="text-3xl font-bold mb-6">Buat Program Baru</h1>
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Input Judul Program */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Judul Program:
@@ -94,6 +108,7 @@ const CreateProgram = () => {
           />
         </div>
 
+        {/* Input Detail Program */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Detail Program:
@@ -107,6 +122,7 @@ const CreateProgram = () => {
           />
         </div>
 
+        {/* Input Kategori */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Kategori:
@@ -121,6 +137,7 @@ const CreateProgram = () => {
           />
         </div>
 
+        {/* Input Tanggal Mulai */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Tanggal Mulai:
@@ -135,6 +152,7 @@ const CreateProgram = () => {
           />
         </div>
 
+        {/* Input Tanggal Berakhir */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Tanggal Berakhir:
@@ -149,6 +167,7 @@ const CreateProgram = () => {
           />
         </div>
 
+        {/* Input Target Donasi */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Target Donasi:
@@ -163,22 +182,44 @@ const CreateProgram = () => {
           />
         </div>
 
+        {/* Input Upload Gambar */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Upload Gambar:
+            Upload Gambar (Bisa lebih dari satu):
           </label>
           <input
             type="file"
             name="images"
             onChange={handleFileChange}
-            multiple
+            multiple // Mengizinkan multiple file upload
             required
             className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
 
+        {/* Tampilkan preview gambar yang dipilih */}
+        {formData.images.length > 0 && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Preview Gambar:
+            </label>
+            <div className="flex space-x-2">
+              {formData.images.map((image, index) => (
+                <img
+                  key={index}
+                  src={URL.createObjectURL(image)} // Tampilkan preview gambar
+                  alt={`Preview ${index + 1}`}
+                  className="w-16 h-16 object-cover rounded-md"
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Tampilkan pesan error jika ada */}
         {error && <p className="text-red-500">{error}</p>}
 
+        {/* Tombol Submit */}
         <button
           type="submit"
           disabled={loading}

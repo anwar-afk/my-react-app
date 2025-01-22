@@ -65,6 +65,11 @@ const CampaignCard = ({ campaign }) => {
     transform: inView ? "translateY(0px)" : "translateY(50px)",
   });
 
+  // Ambil gambar pertama dari array images
+  const firstImage = campaign.images && campaign.images.length > 0
+    ? `https://express-production-fac9.up.railway.app${campaign.images[0]}`
+    : "https://via.placeholder.com/150"; // Fallback image jika tidak ada gambar
+
   return (
     <animated.div ref={ref} style={cardAnimation}>
       <Link
@@ -72,7 +77,7 @@ const CampaignCard = ({ campaign }) => {
         className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
       >
         <img
-          src={campaign.image}
+          src={firstImage}
           alt={campaign.title}
           className="w-full h-32 object-cover"
         />

@@ -4,6 +4,11 @@ import { useSpring, animated } from '@react-spring/web';
 import { getCampaigns } from '../../services/campaignService';
 import { AuthContext } from '../../context/AuthContext';
 import { createDonation, getDonationHistory } from '../../services/donateService';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import { Navigation, Pagination } from 'swiper/modules';
 
 const DonationDetailPage = () => {
   const { id } = useParams();
@@ -120,11 +125,25 @@ const DonationDetailPage = () => {
       <main className="container mx-auto px-4 sm:px-6 lg:px-20 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div>
-            <img
-              src={campaign.image}
-              alt="Donation Detail"
-              className="rounded-lg shadow-lg hover:scale-105 transform transition-transform duration-500"
-            />
+            <Swiper
+              modules={[Navigation, Pagination]}
+              spaceBetween={10}
+              slidesPerView={1}
+              navigation
+              pagination={{ clickable: true }}
+              loop={true}
+              className="rounded-lg shadow-lg"
+            >
+              {campaign.images.map((image, index) => (
+                <SwiperSlide key={index}>
+                  <img
+                    src={`https://express-production-fac9.up.railway.app${image}`}
+                    alt={`Campaign Image ${index + 1}`}
+                    className="w-full h-96 object-cover rounded-lg"
+                  />
+                </SwiperSlide>
+              ))}
+            </Swiper>
           </div>
 
           <div className="bg-white p-6 lg:p-8 rounded-lg shadow-md">
@@ -144,13 +163,14 @@ const DonationDetailPage = () => {
           </div>
         </div>
 
+        {/* Riwayat Donasi */}
         <section className="mt-12">
           <h3 className="text-2xl font-bold text-gray-800">Riwayat Donasi</h3>
           <div className="mt-6 space-y-6">
             {user ? (
               donationHistory.filter((donation) => donation.paymentStatus === 'success').length > 0 ? (
                 donationHistory
-                  .filter((donation) => donation.paymentStatus === 'success') // Filter hanya donasi dengan status "success"
+                  .filter((donation) => donation.paymentStatus === 'success')
                   .map((donation) => (
                     <div key={donation._id} className="flex justify-between items-center border-b pb-4">
                       <div className="flex items-center space-x-4">

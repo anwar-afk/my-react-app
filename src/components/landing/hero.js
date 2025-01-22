@@ -142,27 +142,34 @@ const ProgramKerja = () => {
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-          {campaigns.map((campaign) => (
-            <Link
-              to={`/donation/${campaign._id}`}
-              key={campaign._id}
-              className="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
-            >
-              <img
-                src={campaign.image}
-                alt={campaign.title}
-                className="w-full h-48 object-cover rounded-t-lg"
-              />
-              <div className="p-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">{campaign.title}</h3>
-                <p className="text-gray-600 mb-4">{campaign.detail}</p>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-500">Target: Rp {campaign.target.toLocaleString()}</span>
-                  <span className="text-sm text-gray-500">Terkumpul: Rp {campaign.currentAmount.toLocaleString()}</span>
+          {campaigns.map((campaign) => {
+            // Ambil gambar pertama dari array images
+            const firstImage = campaign.images && campaign.images.length > 0
+              ? `https://express-production-fac9.up.railway.app${campaign.images[0]}`
+              : "https://via.placeholder.com/150"; // Fallback image jika tidak ada gambar
+
+            return (
+              <Link
+                to={`/donation/${campaign._id}`}
+                key={campaign._id}
+                className="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+              >
+                <img
+                  src={firstImage}
+                  alt={campaign.title}
+                  className="w-full h-48 object-cover rounded-t-lg"
+                />
+                <div className="p-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">{campaign.title}</h3>
+                  <p className="text-gray-600 mb-4">{campaign.detail}</p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-500">Target: Rp {campaign.target.toLocaleString()}</span>
+                    <span className="text-sm text-gray-500">Terkumpul: Rp {campaign.currentAmount.toLocaleString()}</span>
+                  </div>
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
         </div>
       </div>
     </FadeInComponent>

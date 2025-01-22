@@ -1,16 +1,45 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useSpring, animated } from "@react-spring/web";
+import axios from "axios";
+// Import Swiper
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
 const Album = () => {
+  const [documentations, setDocumentations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const currentDate = new Date();
   const maxYear = currentDate.getFullYear();
-  const [currentYear, setCurrentYear] = React.useState(2025);
-  const [currentMonth, setCurrentMonth] = React.useState(currentDate.getMonth());
+  const [currentYear, setCurrentYear] = useState(2025);
+  const [currentMonth, setCurrentMonth] = useState(currentDate.getMonth());
 
   const months = [
     "Januari", "Februari", "Maret", "April", "Mei", "Juni",
     "Juli", "Agustus", "September", "Oktober", "November", "Desember"
   ];
+
+  // Fetch data dokumentasi dari API
+  useEffect(() => {
+    const fetchDocumentations = async () => {
+      try {
+        const response = await axios.get(
+          "https://express-production-fac9.up.railway.app/api/documentations"
+        );
+        setDocumentations(response.data);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchDocumentations();
+  }, []);
 
   const handleNextYear = () => {
     if (currentYear < maxYear) {
@@ -46,37 +75,28 @@ const Album = () => {
     }
   };
 
-  const photos = [
-    {
-      id: 1,
-      location: "Mississauga, Ontario",
-      image: "/images/album-image.png",
-      title: "Title Text",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore...",
-      date: "Jan 31",
-    },
-    {
-      id: 2,
-      location: "London, UK",
-      image: "/images/album-image.png",
-      title: "Title Text",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore...",
-      date: "Jan 31",
-    },
-    {
-      id: 3,
-      location: "Lausanne, Switzerland",
-      image: "/images/album-image.png",
-      title: "Title Text",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore...",
-      date: "Jan 31",
-    },
-  ];
-
   const fadeProps = useSpring({
     from: { opacity: 0 },
     to: { opacity: 1 },
     config: { duration: 1000 },
+  });
+
+  // Fungsi untuk memformat tanggal
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "short",
+    });
+  };
+
+  // Filter dokumentasi berdasarkan tahun dan bulan
+  const filteredDocumentations = documentations.filter((doc) => {
+    const docDate = new Date(doc.date);
+    return (
+      docDate.getFullYear() === currentYear &&
+      docDate.getMonth() === currentMonth
+    );
   });
 
   return (
@@ -94,7 +114,7 @@ const Album = () => {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-4xl font-bold">{currentYear}</h2>
           <div className="flex gap-4">
-            <button 
+            <button
               onClick={handlePrevYear}
               className={`p-2 rounded-full hover:bg-gray-100 transition-colors ${
                 currentYear <= 2024 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600'
@@ -103,7 +123,7 @@ const Album = () => {
             >
               <span className="material-icons">Tahun sebelumnya</span>
             </button>
-            <button 
+            <button
               onClick={handleNextYear}
               className={`p-2 rounded-full hover:bg-gray-100 transition-colors ${
                 currentYear >= maxYear ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600'
@@ -124,7 +144,7 @@ const Album = () => {
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-2xl font-semibold">{months[currentMonth]}</h3>
           <div className="flex gap-4">
-            <button 
+            <button
               onClick={handlePrevMonth}
               className={`p-2 rounded-full hover:bg-gray-100 transition-colors ${
                 currentYear === 2024 && currentMonth === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600'
@@ -133,7 +153,7 @@ const Album = () => {
             >
               <span className="material-icons">chevron_left</span>
             </button>
-            <button 
+            <button
               onClick={handleNextMonth}
               className={`p-2 rounded-full hover:bg-gray-100 transition-colors ${
                 currentYear === maxYear && currentMonth === currentDate.getMonth() ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600'
@@ -144,30 +164,51 @@ const Album = () => {
             </button>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {photos.map((photo) => (
-            <div key={photo.id} className="bg-gray-100 rounded-lg overflow-hidden shadow-md">
-              <div className="relative">
-                <img
-                  src={photo.image}
-                  alt={photo.title}
-                  className="w-full h-48 object-cover"
-                />
-                <span className="absolute top-3 left-3 bg-gray-700 text-white text-xs px-2 py-1 rounded">
-                  {photo.location}
-                </span>
+
+        {/* Tampilkan dokumentasi */}
+        {loading ? (
+          <p>Loading...</p>
+        ) : error ? (
+          <p className="text-red-500">Error: {error}</p>
+        ) : filteredDocumentations.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredDocumentations.map((doc) => (
+              <div key={doc._id} className="bg-gray-100 rounded-lg overflow-hidden shadow-md">
+                <div className="relative">
+                  {/* Swiper untuk multiple images */}
+                  <Swiper
+                    modules={[Navigation, Pagination]}
+                    navigation
+                    pagination={{ clickable: true }}
+                    className="w-full h-48"
+                  >
+                    {doc.images.map((image, index) => (
+                      <SwiperSlide key={index}>
+                        <img
+                          src={`https://express-production-fac9.up.railway.app${image}`}
+                          alt={`${doc.title} - ${index + 1}`}
+                          className="w-full h-48 object-cover"
+                        />
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
+                  <span className="absolute top-3 left-3 bg-gray-700 text-white text-xs px-2 py-1 rounded">
+                    {doc.title}
+                  </span>
+                </div>
+                <div className="p-4">
+                  <h4 className="text-lg font-semibold">{doc.title}</h4>
+                  <p className="text-sm text-gray-500 mt-4 flex items-center">
+                    <span className="material-icons text-sm mr-2">calendar_today</span>
+                    {formatDate(doc.date)}
+                  </p>
+                </div>
               </div>
-              <div className="p-4">
-                <h4 className="text-lg font-semibold">{photo.title}</h4>
-                <p className="text-sm text-gray-500">{photo.description}</p>
-                <p className="text-sm text-gray-500 mt-4 flex items-center">
-                  <span className="material-icons text-sm mr-2">calendar_today</span>
-                  {photo.date}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500">Tidak ada dokumentasi untuk bulan ini.</p>
+        )}
       </div>
 
       {/* Load More Button */}

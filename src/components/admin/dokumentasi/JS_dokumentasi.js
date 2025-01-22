@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-const DokumentasiPage = () => {
+const Dokumentasi = () => {
   const [documentations, setDocumentations] = useState([]); // State untuk menyimpan data dokumentasi
   const [loading, setLoading] = useState(true); // State untuk loading
   const [error, setError] = useState(null); // State untuk error
@@ -88,4 +88,4 @@ const DokumentasiPage = () => {
   );
 };
 
-export default DokumentasiPage;
+export default Dokumentasi;
