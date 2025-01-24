@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+// Import Swiper React components
+import { Swiper, SwiperSlide } from "swiper/react";
+// Import Swiper styles
+import "swiper/css";
+import "swiper/css/pagination";
+import "swiper/css/navigation";
+// Import required modules
+import { Pagination, Navigation } from "swiper/modules";
 
 const DokumentasiPage = () => {
   const [documentations, setDocumentations] = useState([]); // State untuk menyimpan data dokumentasi
@@ -35,6 +43,25 @@ const DokumentasiPage = () => {
     });
   };
 
+  // Fungsi untuk menghapus dokumentasi
+  const handleDeleteDocumentation = async (documentationId) => {
+    try {
+      const token = localStorage.getItem("token"); // Ambil token dari localStorage
+      await axios.delete(
+        `https://express-production-fac9.up.railway.app/api/documentations/${documentationId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Tambahkan token ke header
+          },
+        }
+      );
+      // Perbarui state dengan menghapus dokumentasi yang telah dihapus
+      setDocumentations(documentations.filter(doc => doc._id !== documentationId));
+    } catch (err) {
+      console.error("Error deleting documentation:", err);
+    }
+  };
+
   return (
     <div className="flex-1 p-8">
       <h1 className="text-3xl font-bold mb-6">Dokumentasi Page</h1>
@@ -59,13 +86,26 @@ const DokumentasiPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {documentations.map((doc) => (
             <div key={doc._id} className="bg-white rounded-lg shadow-md overflow-hidden">
-              {/* Tampilkan gambar pertama */}
+              {/* Swiper untuk menampilkan gambar */}
               {doc.images.length > 0 && (
-                <img
-                  src={`https://express-production-fac9.up.railway.app${doc.images[0]}`}
-                  alt={doc.title}
-                  className="w-full h-48 object-cover"
-                />
+                <Swiper
+                  pagination={{
+                    type: "fraction",
+                  }}
+                  navigation={true}
+                  modules={[Pagination, Navigation]}
+                  className="mySwiper"
+                >
+                  {doc.images.map((image, index) => (
+                    <SwiperSlide key={index}>
+                      <img
+                        src={`https://express-production-fac9.up.railway.app${image}`}
+                        alt={`Dokumentasi ${index + 1}`}
+                        className="w-full h-48 object-cover"
+                      />
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
               )}
 
               {/* Detail dokumentasi */}
@@ -77,6 +117,13 @@ const DokumentasiPage = () => {
                 <p className="text-sm text-gray-500">
                   Dibuat pada: {formatDate(doc.createdAt)}
                 </p>
+                {/* Tombol Delete */}
+                <button
+                  onClick={() => handleDeleteDocumentation(doc._id)}
+                  className="mt-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+                >
+                  Delete
+                </button>
               </div>
             </div>
           ))}

@@ -76,6 +76,23 @@ const ProgramPage = () => {
     }
   };
 
+  // Fungsi untuk menghapus program
+  const handleDeleteProgram = async (campaignId) => {
+    try {
+      await axios.delete(
+        `${baseUrl}/api/campaigns/${campaignId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Tambahkan token ke header
+          },
+        }
+      );
+      fetchCampaigns(); // Refresh data campaigns setelah menghapus program
+    } catch (error) {
+      console.error('Error deleting program:', error);
+    }
+  };
+
   return (
     <div className="flex-1 p-8">
       <h1 className="text-3xl font-bold mb-6">Program Admin</h1>
@@ -128,9 +145,7 @@ const ProgramPage = () => {
                     Edit
                   </button>
                   <button
-                    onClick={() => {
-                      // Tambahkan logika untuk menghapus campaign di sini
-                    }}
+                    onClick={() => handleDeleteProgram(campaign._id)}
                     className="bg-red-500 text-white px-4 py-2 rounded-md"
                   >
                     Delete
