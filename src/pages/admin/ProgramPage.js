@@ -5,6 +5,8 @@ import ProgramForm from '../../components/admin/JS_programForm'; // Sesuaikan pa
 const ProgramPage = () => {
   const [selectedProgram, setSelectedProgram] = useState(null); // Untuk menyimpan program yang dipilih (edit)
   const [campaigns, setCampaigns] = useState([]); // Untuk menyimpan data campaigns
+  const [modalIsOpen, setModalIsOpen] = useState(false); // State untuk mengontrol modal
+  const [notification, setNotification] = useState(null); // State untuk notifikasi
 
   // Ambil token dari localStorage
   const token = localStorage.getItem('token');
@@ -48,9 +50,11 @@ const ProgramPage = () => {
         }
       );
       fetchCampaigns(); // Refresh data campaigns setelah membuat program baru
+      showNotification('Program berhasil dibuat!', 'success'); // Tampilkan notifikasi sukses
       return response.data;
     } catch (error) {
       console.error('Error creating program:', error);
+      showNotification('Gagal membuat program.', 'error'); // Tampilkan notifikasi error
       throw error;
     }
   };
@@ -69,9 +73,13 @@ const ProgramPage = () => {
         }
       );
       fetchCampaigns(); // Refresh data campaigns setelah mengedit program
+      setSelectedProgram(null); // Reset selected program setelah update
+      setModalIsOpen(false); // Tutup modal setelah berhasil
+      showNotification('Program berhasil diperbarui!', 'success'); // Tampilkan notifikasi sukses
       return response.data;
     } catch (error) {
       console.error('Error updating program:', error);
+      showNotification('Gagal memperbarui program.', 'error'); // Tampilkan notifikasi error
       throw error;
     }
   };
@@ -88,9 +96,19 @@ const ProgramPage = () => {
         }
       );
       fetchCampaigns(); // Refresh data campaigns setelah menghapus program
+      showNotification('Program berhasil dihapus!', 'success'); // Tampilkan notifikasi sukses
     } catch (error) {
       console.error('Error deleting program:', error);
+      showNotification('Gagal menghapus program.', 'error'); // Tampilkan notifikasi error
     }
+  };
+
+  // Fungsi untuk menampilkan notifikasi
+  const showNotification = (message, type) => {
+    setNotification({ message, type });
+    setTimeout(() => {
+      setNotification(null); // Hapus notifikasi setelah 3 detik
+    }, 3000);
   };
 
   return (
@@ -99,12 +117,9 @@ const ProgramPage = () => {
 
       {/* Form Buat/Edit Program */}
       <div className="bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold mb-4">
-          {selectedProgram ? 'Edit Program' : 'Buat Program Baru'}
-        </h2>
+        <h2 className="text-xl font-semibold mb-4">Buat Program Baru</h2>
         <ProgramForm
-          programData={selectedProgram} // Kirim data program jika sedang edit
-          onSubmit={selectedProgram ? handleUpdateProgram : handleCreateProgram} // Pilih fungsi create atau update
+          onSubmit={handleCreateProgram} // Fungsi untuk membuat program baru
         />
       </div>
 
@@ -139,7 +154,10 @@ const ProgramPage = () => {
                 <td className="py-2 px-4 border-b">{new Date(campaign.date).toLocaleDateString()}</td>
                 <td className="py-2 px-4 border-b">
                   <button
-                    onClick={() => setSelectedProgram(campaign)}
+                    onClick={() => {
+                      setSelectedProgram(campaign);
+                      setModalIsOpen(true); // Buka modal saat tombol edit diklik
+                    }}
                     className="bg-blue-500 text-white px-4 py-2 rounded-md mr-2"
                   >
                     Edit
@@ -156,6 +174,31 @@ const ProgramPage = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Modal untuk Edit Program */}
+      {modalIsOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-4 rounded-lg shadow-md w-11/12 md:w-1/2 lg:w-1/3">
+            <h2 className="text-xl font-semibold mb-4">Edit Program</h2>
+            <ProgramForm
+              programData={selectedProgram} // Kirim data program jika sedang edit
+              onSubmit={handleUpdateProgram} // Fungsi untuk mengedit program
+              onCancel={() => setModalIsOpen(false)} // Tutup modal saat tombol cancel diklik
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Notifikasi */}
+      {notification && (
+        <div
+          className={`fixed bottom-4 right-4 p-4 rounded-md text-white ${
+            notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+          }`}
+        >
+          {notification.message}
+        </div>
+      )}
     </div>
   );
 };

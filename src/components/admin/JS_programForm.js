@@ -1,179 +1,149 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 
-const ProgramForm = ({ programData, onSubmit }) => {
-  const [formData, setFormData] = useState({
-    title: programData?.title || '',
-    detail: programData?.detail || '',
-    category: programData?.category || '',
-    startDate: programData?.startDate || '',
-    endDate: programData?.endDate || '',
-    target: programData?.target || '',
-    images: [],
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+const ProgramForm = ({ programData, onSubmit, onCancel }) => {
+  const [title, setTitle] = useState(programData ? programData.title : '');
+  const [detail, setDetail] = useState(programData ? programData.detail : '');
+  const [category, setCategory] = useState(programData ? programData.category : '');
+  const [startDate, setStartDate] = useState(programData ? programData.startDate : '');
+  const [endDate, setEndDate] = useState(programData ? programData.endDate : '');
+  const [target, setTarget] = useState(programData ? programData.target : '');
+  const [images, setImages] = useState([]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
-  const handleFileChange = (e) => {
-    setFormData({
-      ...formData,
-      images: e.target.files,
-    });
-  };
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('detail', detail);
+    formData.append('category', category);
+    formData.append('startDate', startDate);
+    formData.append('endDate', endDate);
+    formData.append('target', target);
+    images.forEach((image) => {
+      formData.append('images', image);
+    });
+    onSubmit(formData);
+  };
 
-    const data = new FormData();
-    data.append('title', formData.title);
-    data.append('detail', formData.detail);
-    data.append('category', formData.category);
-    data.append('startDate', formData.startDate);
-    data.append('endDate', formData.endDate);
-    data.append('target', formData.target);
-
-    for (let i = 0; i < formData.images.length; i++) {
-      data.append('images', formData.images[i]);
-    }
-
-    try {
-      await onSubmit(data); // Kirim data ke fungsi onSubmit (create atau update)
-      alert('Program berhasil disimpan!');
-      setFormData({
-        title: '',
-        detail: '',
-        category: '',
-        startDate: '',
-        endDate: '',
-        target: '',
-        images: [],
-      });
-    } catch (err) {
-      setError('Gagal menyimpan program. Silakan coba lagi.');
-      console.error('Error:', err);
-    } finally {
-      setLoading(false);
-    }
+  const handleImageChange = (e) => {
+    setImages([...e.target.files]);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Judul Program:
+    <form onSubmit={handleSubmit}>
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">
+          Judul Program
         </label>
         <input
           type="text"
-          name="title"
-          value={formData.title}
-          onChange={handleChange}
+          id="title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           required
-          className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Detail Program:
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="detail">
+          Detail Program
         </label>
         <textarea
-          name="detail"
-          value={formData.detail}
-          onChange={handleChange}
+          id="detail"
+          value={detail}
+          onChange={(e) => setDetail(e.target.value)}
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           required
-          className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Kategori:
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="category">
+          Kategori
         </label>
-        <input
-          type="text"
-          name="category"
-          value={formData.category}
-          onChange={handleChange}
+        <select
+          id="category"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           required
-          className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        />
+        >
+          <option value="pendidikan">Pendidikan</option>
+          <option value="kesehatan">Kesehatan</option>
+          <option value="sosial">Sosial</option>
+        </select>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Tanggal Mulai:
-        </label>
-        <input
-          type="date"
-          name="startDate"
-          value={formData.startDate}
-          onChange={handleChange}
-          required
-          className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Tanggal Berakhir:
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="startDate">
+          Tanggal Mulai
         </label>
         <input
           type="date"
-          name="endDate"
-          value={formData.endDate}
-          onChange={handleChange}
+          id="startDate"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           required
-          className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Target Donasi:
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="endDate">
+          Tanggal Berakhir
+        </label>
+        <input
+          type="date"
+          id="endDate"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          required
+        />
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="target">
+          Target Donasi
         </label>
         <input
           type="number"
-          name="target"
-          value={formData.target}
-          onChange={handleChange}
+          id="target"
+          value={target}
+          onChange={(e) => setTarget(e.target.value)}
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           required
-          className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Upload Gambar:
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="images">
+          Upload Gambar
         </label>
         <input
           type="file"
-          name="images"
-          onChange={handleFileChange}
+          id="images"
+          onChange={handleImageChange}
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           multiple
-          required={!programData} // Hanya wajib diisi saat membuat program baru
-          className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
 
-      {error && <p className="text-red-500">{error}</p>}
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full py-3 px-4 rounded-lg bg-blue-500 text-white font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-      >
-        {loading ? 'Menyimpan Program...' : 'Simpan Program'}
-      </button>
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="bg-gray-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-gray-600"
+        >
+          Batal
+        </button>
+        <button
+          type="submit"
+          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+        >
+          Simpan
+        </button>
+      </div>
     </form>
   );
 };
