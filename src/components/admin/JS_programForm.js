@@ -9,6 +9,16 @@ const ProgramForm = ({ programData, onSubmit, onCancel }) => {
   const [target, setTarget] = useState(programData ? programData.target : '');
   const [images, setImages] = useState([]);
 
+  // Daftar kategori yang tersedia
+  const categories = [
+    "bencana alam",
+    "pendidikan",
+    "kesehatan",
+    "kemanusiaan",
+    "lingkungan",
+    "lainnya",
+  ];
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData();
@@ -68,9 +78,11 @@ const ProgramForm = ({ programData, onSubmit, onCancel }) => {
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           required
         >
-          <option value="pendidikan">Pendidikan</option>
-          <option value="kesehatan">Kesehatan</option>
-          <option value="sosial">Sosial</option>
+          {categories.map((cat, index) => (
+            <option key={index} value={cat}>
+              {cat}
+            </option>
+          ))}
         </select>
       </div>
 

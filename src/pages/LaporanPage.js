@@ -4,8 +4,7 @@ import Laporan from '../components/laporan/laporan';
 const laporan = () => {
     return (
         <div className="container mx-auto px-4 py-8">
-            <h1 className="text-3xl font-bold mb-6">Laporan Keuangan</h1>
-            <Laporan />
+            <h1 className="text-3xl font-bold mb-6">Belum ada laporan tahun ini</h1>
         </div>
     );
 };

@@ -23,11 +23,11 @@ export const DonasiHeader = () => {
     <animated.div
       ref={ref}
       style={headerAnimation}
-      className="flex flex-col lg:flex-row items-center justify-between px-10 lg:px-60 py-20 bg-green-100"
+      className="flex flex-col lg:flex-row items-center justify-between px-6 lg:px-60 py-10 bg-green-100"
     >
       {/* Left Section */}
       <div className="lg:max-w-lg text-center lg:text-left mb-10 lg:mb-0">
-        <h1 className="text-4xl font-extrabold text-brown-800 mb-6">
+        <h1 className="text-3xl lg:text-4xl font-extrabold text-brown-800 mb-6">
           Bersama <br /> Wujudkan Harapan
         </h1>
         <p className="text-lg text-gray-700 mb-6 leading-relaxed">
@@ -47,63 +47,23 @@ export const DonasiHeader = () => {
         <img
           src="/image/child smiling.png" // Ganti dengan path gambar
           alt="Child Smiling"
-          className="w-80 h-80 lg:w-96 lg:h-96 object-cover rounded-full"
+          className="w-64 h-64 lg:w-96 lg:h-96 object-cover rounded-full"
         />
         <div className="absolute bottom-0 left-0 transform -translate-x-10 translate-y-10">
-          <div className="w-20 h-20 bg-green-400 rounded-full"></div>
+          <div className="w-16 h-16 bg-green-400 rounded-full"></div>
         </div>
       </div>
     </animated.div>
   );
 };
 
-// Single Campaign Card Component
-const CampaignCard = ({ campaign }) => {
-  const { ref, inView } = useInView({ triggerOnce: true });
-  const cardAnimation = useSpring({
-    opacity: inView ? 1 : 0,
-    transform: inView ? "translateY(0px)" : "translateY(50px)",
-  });
-
-  // Ambil gambar pertama dari array images
-  const firstImage = campaign.images && campaign.images.length > 0
-    ? `https://express-production-fac9.up.railway.app${campaign.images[0]}`
-    : "https://via.placeholder.com/150"; // Fallback image jika tidak ada gambar
-
-  return (
-    <animated.div ref={ref} style={cardAnimation}>
-      <Link
-        to={`/donation/${campaign._id}`}
-        className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
-      >
-        <img
-          src={firstImage}
-          alt={campaign.title}
-          className="w-full h-32 object-cover"
-        />
-        <div className="p-4">
-          <span className="text-xs bg-green-100 text-green-600 font-medium px-2 py-1 rounded-full inline-block mb-2">
-            {campaign.category}
-          </span>
-          <h3 className="text-md font-semibold text-gray-800 mb-2">
-            {campaign.title}
-          </h3>
-          <div className="text-green-500 font-medium hover:underline flex items-center">
-            Lihat Selengkapnya <span className="ml-1">→</span>
-          </div>
-        </div>
-      </Link>
-    </animated.div>
-  );
-};
-
-// DonasiContent Component
+// Komponen DonasiContent
 export const DonasiContent = () => {
   const [campaigns, setCampaigns] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [showAll, setShowAll] = useState(false);
   const categories = [
-    "bencana_alam",
+    "bencana alam",
     "pendidikan",
     "kesehatan",
     "kemanusiaan",
@@ -134,12 +94,12 @@ export const DonasiContent = () => {
   const visibleCampaigns = showAll ? filteredCampaigns : filteredCampaigns.slice(0, 4);
 
   return (
-    <div id="donasi-content" className="px-10 lg:px-40 py-20">
-      <h1 className="text-5xl font-normal text-green-500 mb-10 mb-40 mt-20">
+    <div id="donasi-content" className="px-6 lg:px-40 py-10">
+      <h1 className="text-4xl lg:text-5xl font-normal text-green-500 mb-10 mb-40 mt-20">
         Mari Bantu <span className="font-semibold">Mereka</span>
       </h1>
       <div className="flex justify-between items-center mb-10">
-        <h2 className="text-3xl font-bold text-gray-800">Donasi</h2>
+        <h2 className="text-2xl lg:text-3xl font-bold text-gray-800">Donasi</h2>
         <div className="flex space-x-4">
           <select
             value={selectedCategory}
@@ -182,7 +142,47 @@ export const DonasiContent = () => {
   );
 };
 
-// Main Donasi Component
+// Komponen CampaignCard
+const CampaignCard = ({ campaign }) => {
+  const { ref, inView } = useInView({ triggerOnce: true });
+  const cardAnimation = useSpring({
+    opacity: inView ? 1 : 0,
+    transform: inView ? "translateY(0px)" : "translateY(50px)",
+  });
+
+  // Ambil gambar pertama dari array images
+  const firstImage = campaign.images && campaign.images.length > 0
+    ? `https://express-production-fac9.up.railway.app${campaign.images[0]}`
+    : "https://via.placeholder.com/150"; // Fallback image jika tidak ada gambar
+
+  return (
+    <animated.div ref={ref} style={cardAnimation}>
+      <Link
+        to={`/donation/${campaign._id}`}
+        className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+      >
+        <img
+          src={firstImage}
+          alt={campaign.title}
+          className="w-full h-32 object-cover"
+        />
+        <div className="p-4">
+          <span className="text-xs bg-green-100 text-green-600 font-medium px-2 py-1 rounded-full inline-block mb-2">
+            {campaign.category}
+          </span>
+          <h3 className="text-md font-semibold text-gray-800 mb-2">
+            {campaign.title}
+          </h3>
+          <div className="text-green-500 font-medium hover:underline flex items-center">
+            Lihat Selengkapnya <span className="ml-1">→</span>
+          </div>
+        </div>
+      </Link>
+    </animated.div>
+  );
+};
+
+// Komponen Utama Donasi
 const Donasi = () => {
   return (
     <div>

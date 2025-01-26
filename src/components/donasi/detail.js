@@ -139,7 +139,7 @@ const DonationDetailPage = () => {
                   <img
                     src={`https://express-production-fac9.up.railway.app${image}`}
                     alt={`Campaign Image ${index + 1}`}
-                    className="w-full h-96 object-cover rounded-lg"
+                    className="w-full h-64 lg:h-96 object-cover rounded-lg"
                   />
                 </SwiperSlide>
               ))}
@@ -150,7 +150,7 @@ const DonationDetailPage = () => {
             <span className="text-sm text-green-600 bg-green-100 px-3 py-1 rounded-full">
               {campaign.category}
             </span>
-            <h2 className="text-3xl font-bold text-gray-800 mt-4">{campaign.title}</h2>
+            <h2 className="text-2xl lg:text-3xl font-bold text-gray-800 mt-4">{campaign.title}</h2>
             <p className="text-gray-600 mt-4 text-lg leading-relaxed">
               {campaign.detail}
             </p>

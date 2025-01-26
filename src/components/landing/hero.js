@@ -33,16 +33,15 @@ const Hero1 = () => {
 
         <div className="mt-10 lg:mt-0 lg:max-w-2xl">
           <h1 className="text-4xl font-bold text-gray-800 mb-6 hover:text-green-500 transition-colors duration-300">
-            Lorem ipsum dolor sit amet, <br /> consectetur adipiscing elit.
+          Bersama Mewujudkan Harapan, <br /> Memberi Kehidupan Baru.
           </h1>
           <p className="text-gray-600 text-lg mb-8 leading-relaxed">
-            Donec a eros justo. Fusce egestas tristique ultrices. Nam tempor,
-            augue nec tincidunt molestie, massa nunc varius arcu, et scelerisque
-            elit erat a magna.
+          Dukung langkah kecil untuk perubahan besar. Bergabunglah dengan kami dalam misi kebaikan untuk membantu mereka yang membutuhkan.
           </p>
-          <button className="px-6 py-3 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
+          <Link to="/donasi"  
+            className="px-6 py-3 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
             Donasi disini
-          </button>
+          </Link>
         </div>
       </div>
     </FadeInComponent>
@@ -84,29 +83,7 @@ const Summary = () => {
   );
 };
 
-// Komponen Hero Kedua
-const Hero2 = () => {
-  return (
-    <FadeInComponent>
-      <div className="flex flex-col lg:flex-row items-center justify-between px-40 py-20 bg-white mb-10">
-        <div className="text-center lg:text-left max-w-lg lg:max-w-xl">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">
-            Bersama untuk Masa Depan, <span className="text-green-500">ahay.</span>
-          </h1>
-          <p className="text-gray-600 text-lg mb-6">
-            Where to grow your business as a photographer: site or social media?
-          </p>
-          <button className="px-6 py-3 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600">
-            Register
-          </button>
-        </div>
-        <div className="mt-10 lg:mt-0 lg:max-w-md">
-          <img src="/image/hero.png" alt="Illustration" className="w-full" />
-        </div>
-      </div>
-    </FadeInComponent>
-  );
-};
+
 
 // Komponen Program Kerja
 const ProgramKerja = () => {
@@ -182,7 +159,6 @@ const HomePage = () => {
     <div>
       <Hero1 />
       <Summary />
-      <Hero2 />
       <ProgramKerja />
     </div>
   );

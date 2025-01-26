@@ -5,8 +5,7 @@ import About from '../components/about/about';
 const AboutPage = () => {
   return (
     <div className="min-h-screen bg-white">
-      <About />  
-      <About1 />
+      <About /> 
 
     </div>
   );

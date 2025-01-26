@@ -2,7 +2,7 @@ import React from 'react';
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-800 text-gray-300 py-10 px-10 lg:px-40">
+    <footer className="bg-gray-800 text-gray-300 py-10 px-6 lg:px-40">
       <div className="flex flex-col lg:flex-row justify-between items-start space-y-10 lg:space-y-0">
         {/* Logo Section */}
         <div>
@@ -28,7 +28,7 @@ const Footer = () => {
         </div>
 
         {/* Links Section */}
-        <div className="flex space-x-16">
+        <div className="flex flex-col lg:flex-row space-y-8 lg:space-y-0 lg:space-x-16">
           {/* Company Links */}
           <div>
             <h3 className="text-white font-semibold mb-4">Company</h3>

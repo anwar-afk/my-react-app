@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSpring, animated } from "@react-spring/web";
 import axios from "axios";
-// Import Swiper
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
@@ -100,12 +99,12 @@ const Album = () => {
   });
 
   return (
-    <animated.div style={fadeProps} className="bg-white text-gray-800 min-h-screen px-10 lg:px-40 py-16">
+    <animated.div style={fadeProps} className="bg-white text-gray-800 min-h-screen px-6 lg:px-40 py-10">
       {/* Header */}
       <div className="border-b border-gray-300 pb-6">
         <h1 className="text-3xl font-bold mb-2">Dokumentasi</h1>
         <div className="flex justify-between items-center">
-          <p className="text-gray-500">foto</p>
+          <p className="text-gray-500">Foto</p>
         </div>
       </div>
 
@@ -167,7 +166,9 @@ const Album = () => {
 
         {/* Tampilkan dokumentasi */}
         {loading ? (
-          <p>Loading...</p>
+          <div className="flex justify-center items-center h-48">
+            <p className="text-gray-600">Memuat dokumentasi...</p>
+          </div>
         ) : error ? (
           <p className="text-red-500">Error: {error}</p>
         ) : filteredDocumentations.length > 0 ? (
