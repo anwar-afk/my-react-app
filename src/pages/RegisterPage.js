@@ -11,6 +11,8 @@ const RegisterPage = () => {
     phone: '',
   });
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -40,19 +42,18 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex bg-green-50">
-      {/* Left Section: Illustration */}
-      <div className="w-1/2 bg-green-50 flex items-center justify-center relative">
+    <div className="min-h-screen flex flex-col md:flex-row bg-green-50">
+      {/* Image Section */}
+      <div className="w-full md:w-1/2 bg-green-50 flex items-center justify-center p-6 md:p-0">
         <img
-          src="/image/register-image.png" // Replace with your illustration path
+          src="/image/register-image.png"
           alt="Register Illustration"
-          className="max-w-full h-auto"
-          style={{ height: '100%', objectFit: 'cover' }}
+          className="max-w-full h-auto md:max-w-md"
         />
       </div>
 
-      {/* Right Section: Form */}
-      <div className="w-1/2 flex flex-col justify-center items-center p-6">
+      {/* Form Section */}
+      <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
           Please Fill out form to Register!
         </h2>
@@ -84,24 +85,50 @@ const RegisterPage = () => {
             required
             className="w-full px-4 py-2 border border-gray-300 rounded focus:ring focus:ring-green-500 focus:outline-none"
           />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:ring focus:ring-green-500 focus:outline-none"
-          />
-          <input
-            type="password"
-            name="confirmPassword"
-            placeholder="Confirm Password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:ring focus:ring-green-500 focus:outline-none"
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded focus:ring focus:ring-green-500 focus:outline-none"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+            >
+              {showPassword ? (
+                <i className="far fa-eye-slash"></i>
+              ) : (
+                <i className="far fa-eye"></i>
+              )}
+            </button>
+          </div>
+          <div className="relative">
+            <input
+              type={showConfirmPassword ? 'text' : 'password'}
+              name="confirmPassword"
+              placeholder="Confirm Password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded focus:ring focus:ring-green-500 focus:outline-none"
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+            >
+              {showConfirmPassword ? (
+                <i className="far fa-eye-slash"></i>
+              ) : (
+                <i className="far fa-eye"></i>
+              )}
+            </button>
+          </div>
           <button
             type="submit"
             className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600 focus:ring focus:ring-green-500"
@@ -115,17 +142,6 @@ const RegisterPage = () => {
             Login
           </Link>
         </p>
-        <div className="flex justify-center space-x-4 mt-4">
-          <a href="#facebook" className="text-blue-600">
-            <i className="fab fa-facebook"></i>
-          </a>
-          <a href="#whatsapp" className="text-green-600">
-            <i className="fab fa-whatsapp"></i>
-          </a>
-          <a href="#telegram" className="text-blue-400">
-            <i className="fab fa-telegram"></i>
-          </a>
-        </div>
       </div>
     </div>
   );

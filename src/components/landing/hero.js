@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSpring, animated, useInView } from '@react-spring/web';
 import { getCampaigns } from '../../services/campaignService';
+import { getStatistics } from '../../services/statisticService'; // Import service untuk statistik
 
 function FadeInComponent({ children }) {
   const [ref, inView] = useInView({ threshold: 0.2 });
@@ -33,13 +34,15 @@ const Hero1 = () => {
 
         <div className="mt-10 lg:mt-0 lg:max-w-2xl">
           <h1 className="text-4xl font-bold text-gray-800 mb-6 hover:text-green-500 transition-colors duration-300">
-          Bersama Mewujudkan Harapan, <br /> Memberi Kehidupan Baru.
+            Bersama Mewujudkan Harapan, <br /> Memberi Kehidupan Baru.
           </h1>
           <p className="text-gray-600 text-lg mb-8 leading-relaxed">
-          Dukung langkah kecil untuk perubahan besar. Bergabunglah dengan kami dalam misi kebaikan untuk membantu mereka yang membutuhkan.
+            Dukung langkah kecil untuk perubahan besar. Bergabunglah dengan kami dalam misi kebaikan untuk membantu mereka yang membutuhkan.
           </p>
-          <Link to="/donasi"  
-            className="px-6 py-3 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
+          <Link
+            to="/donasi"
+            className="px-6 py-3 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transform hover:scale-105 transition-all duration-300 hover:shadow-xl"
+          >
             Donasi disini
           </Link>
         </div>
@@ -50,6 +53,34 @@ const Hero1 = () => {
 
 // Komponen Summary
 const Summary = () => {
+  const [statistics, setStatistics] = useState({
+    totalSuccessfulDonations: 0,
+    totalRegisteredUsers: 0,
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchStatistics = async () => {
+      try {
+        const data = await getStatistics(); // Ambil data statistik
+        setStatistics({
+          totalSuccessfulDonations: data.totalSuccessfulDonations,
+          totalRegisteredUsers: data.totalRegisteredUsers,
+        });
+      } catch (err) {
+        setError(err.message || 'Gagal mengambil data statistik');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStatistics();
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+
   return (
     <FadeInComponent>
       <div className="bg-green-100 px-10 lg:px-40 py-20 flex flex-col lg:flex-row items-center lg:justify-between">
@@ -66,14 +97,18 @@ const Summary = () => {
           <div className="flex items-center space-x-4">
             <img src="/image/ic-hero3.svg" alt="Donatur Icon" />
             <div>
-              <p className="text-3xl font-bold text-gray-800">2,245,341</p>
+              <p className="text-3xl font-bold text-gray-800">
+                {statistics.totalSuccessfulDonations.toLocaleString()}
+              </p>
               <p className="text-gray-600">Donatur</p>
             </div>
           </div>
           <div className="flex items-center space-x-4 mt-8 lg:mt-0">
             <img src="/image/hand-ic-hero3.svg" alt="Komunitas Icon" />
             <div>
-              <p className="text-3xl font-bold text-gray-800">46,328</p>
+              <p className="text-3xl font-bold text-gray-800">
+                {statistics.totalRegisteredUsers.toLocaleString()}
+              </p>
               <p className="text-gray-600">Komunitas</p>
             </div>
           </div>
@@ -82,8 +117,6 @@ const Summary = () => {
     </FadeInComponent>
   );
 };
-
-
 
 // Komponen Program Kerja
 const ProgramKerja = () => {

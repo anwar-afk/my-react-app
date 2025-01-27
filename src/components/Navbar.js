@@ -11,7 +11,7 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
-    const confirmLogout = window.confirm('Apakah Anda yakin ingin logout?');
+    const confirmLogout = window.confirm('Apakah Anda yakin ingin keluar?');
     if (confirmLogout) {
       logout();
     }
@@ -69,7 +69,7 @@ const Navbar = () => {
               onClick={handleLogout}
               className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-300"
             >
-              Logout
+              keluar
             </button>
           </div>
         ) : (
