@@ -152,7 +152,7 @@ const CampaignCard = ({ campaign }) => {
 
   // Ambil gambar pertama dari array images
   const firstImage = campaign.images && campaign.images.length > 0
-    ? `https://express-production-fac9.up.railway.app${campaign.images[0]}`
+    ? `https://express-production-51f2.up.railway.app/${campaign.images[0]}`
     : "https://via.placeholder.com/150"; // Fallback image jika tidak ada gambar
 
   return (

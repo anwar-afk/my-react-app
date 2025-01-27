@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'https://express-production-fac9.up.railway.app/api'; // Sesuaikan dengan URL API Anda
+const API_URL = 'https://express-production-51f2.up.railway.app/api'; // Sesuaikan dengan URL API Anda
 
 // Fungsi untuk membuat donasi
 export const createDonation = async (campaignId, amount) => {
