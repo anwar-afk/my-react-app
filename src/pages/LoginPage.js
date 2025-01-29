@@ -4,10 +4,7 @@ import { login } from '../services/authService';
 import { AuthContext } from '../context/AuthContext';
 
 const LoginPage = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
@@ -15,6 +12,8 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(''); // Reset error message before attempting login
+
     try {
       const response = await login(formData);
       if (response.token) {
@@ -23,22 +22,19 @@ const LoginPage = () => {
           token: response.token,
           role: response.user.role,
         });
-        if (response.user.role === 'admin') {
-          navigate('/admin');
-        } else {
-          navigate('/');
-        }
+        navigate(response.user.role === 'admin' ? '/admin' : '/');
+      } else {
+        setError('Email atau password salah');
+        alert('Email atau password salah');
       }
     } catch (err) {
       setError(err.message || 'Email atau password salah');
+      alert('Email atau password salah');
     }
   };
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   return (
@@ -50,10 +46,16 @@ const LoginPage = () => {
             Welcome Back!
           </h2>
 
+          {error && (
+            <div className="mb-4 text-red-600 text-sm font-medium bg-red-100 p-2 rounded">
+              {error}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Username:
+                Email:
               </label>
               <input
                 name="email"
