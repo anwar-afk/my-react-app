@@ -213,12 +213,12 @@ const Album = () => {
       </div>
 
       {/* Load More Button */}
-      <div className="flex justify-center mt-10">
+      {/* <div className="flex justify-center mt-10">
         <button className="flex items-center text-green-500 font-semibold hover:underline">
           <span className="mr-2 material-icons">arrow_forward</span>
           Lihat Lebih Banyak
         </button>
-      </div>
+      </div> */}
     </animated.div>
   );
 };

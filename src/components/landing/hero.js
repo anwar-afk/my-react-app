@@ -148,7 +148,7 @@ const ProgramKerja = () => {
         <div className="text-center mb-10 max-w-2xl mx-auto">
           <h2 className="text-3xl font-bold text-gray-800 mb-2">Program Kerja</h2>
           <p className="text-gray-600">
-            The Nexcent blog is the best place to read about the latest membership insights.
+            Berbagilah pada mereka yang membutuhkan.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
