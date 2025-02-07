@@ -10,6 +10,9 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Navigation, Pagination } from 'swiper/modules';
 
+// Base URL API
+const baseUrl = 'https://express-production-51f2.up.railway.app';
+
 const DonationDetailPage = () => {
   const { id } = useParams();
   const [campaign, setCampaign] = useState(null);
@@ -134,30 +137,32 @@ const DonationDetailPage = () => {
               loop={true}
               className="rounded-lg shadow-lg"
             >
-              {campaign.images.map((image, index) => (
-                <SwiperSlide key={index}>
+              {campaign.images?.length > 0 ? (
+                campaign.images.map((image, index) => (
+                  <SwiperSlide key={index}>
+                    <img
+                      src={`${baseUrl}${image}`}
+                      alt={`Campaign Image ${index + 1}`}
+                      className="w-full h-64 lg:h-96 object-cover rounded-lg"
+                    />
+                  </SwiperSlide>
+                ))
+              ) : (
+                <SwiperSlide>
                   <img
-                    src={`https://express-production-fac9.up.railway.app${image}`}
-                    alt={`Campaign Image ${index + 1}`}
+                    src="https://via.placeholder.com/150"
+                    alt="Placeholder Image"
                     className="w-full h-64 lg:h-96 object-cover rounded-lg"
                   />
                 </SwiperSlide>
-              ))}
+              )}
             </Swiper>
           </div>
-
           <div className="bg-white p-6 lg:p-8 rounded-lg shadow-md">
-            <span className="text-sm text-green-600 bg-green-100 px-3 py-1 rounded-full">
-              {campaign.category}
-            </span>
+            <span className="text-sm text-green-600 bg-green-100 px-3 py-1 rounded-full">{campaign.category}</span>
             <h2 className="text-2xl lg:text-3xl font-bold text-gray-800 mt-4">{campaign.title}</h2>
-            <p className="text-gray-600 mt-4 text-lg leading-relaxed">
-              {campaign.detail}
-            </p>
-            <button
-              onClick={openModal}
-              className="w-full mt-6 px-6 py-3 bg-green-500 text-white text-lg rounded-full shadow-md hover:bg-green-600 transform hover:scale-105 transition-all duration-300"
-            >
+            <p className="text-gray-600 mt-4 text-lg leading-relaxed">{campaign.detail}</p>
+            <button onClick={openModal} className="w-full mt-6 px-6 py-3 bg-green-500 text-white text-lg rounded-full shadow-md hover:bg-green-600 transform hover:scale-105 transition-all duration-300">
               Donasi Sekarang
             </button>
           </div>
