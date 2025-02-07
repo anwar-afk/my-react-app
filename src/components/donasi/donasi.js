@@ -4,6 +4,9 @@ import { getCampaigns } from "../../services/campaignService";
 import { useSpring, animated } from "@react-spring/web";
 import { useInView } from "react-intersection-observer";
 
+// Base URL API
+const baseUrl = 'https://express-production-51f2.up.railway.app';
+
 // Komponen Header (DonasiHeader)
 export const DonasiHeader = () => {
   const { ref, inView } = useInView({ triggerOnce: true });
@@ -152,7 +155,7 @@ const CampaignCard = ({ campaign }) => {
 
   // Ambil gambar pertama dari array images
   const firstImage = campaign.images && campaign.images.length > 0
-    ? `https://express-production-51f2.up.railway.app/${campaign.images[0]}`
+    ? `${baseUrl}${campaign.images[0]}` // Gunakan baseUrl di sini
     : "https://via.placeholder.com/150"; // Fallback image jika tidak ada gambar
 
   return (
@@ -162,10 +165,11 @@ const CampaignCard = ({ campaign }) => {
         className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
       >
         <img
-          src={firstImage}
-          alt={campaign.title}
-          className="w-full h-32 object-cover"
+          src={campaign.images?.length > 0 ? `${baseUrl}${campaign.images[0]}` : "https://via.placeholder.com/150"}
+          alt="Campaign Image"
+          className="w-16 h-16 object-cover rounded-md"
         />
+
         <div className="p-4">
           <span className="text-xs bg-green-100 text-green-600 font-medium px-2 py-1 rounded-full inline-block mb-2">
             {campaign.category}
