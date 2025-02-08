@@ -131,7 +131,7 @@ const ProgramKerja = () => {
         const sortedCampaigns = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         setCampaigns(sortedCampaigns.slice(0, 3));
       } catch (err) {
-        setError(err.message || 'Terjadi kesalahan saat mengambil data campaign');
+        setError(err.message || "Terjadi kesalahan saat mengambil data campaign");
       } finally {
         setLoading(false);
       }
@@ -139,24 +139,22 @@ const ProgramKerja = () => {
     fetchCampaigns();
   }, []);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (loading) return <div className="text-center py-10">Loading...</div>;
+  if (error) return <div className="text-center py-10 text-red-600">Error: {error}</div>;
 
   return (
     <FadeInComponent>
       <div className="px-10 lg:px-40 py-20 bg-white">
         <div className="text-center mb-10 max-w-2xl mx-auto">
           <h2 className="text-3xl font-bold text-gray-800 mb-2">Program Kerja</h2>
-          <p className="text-gray-600">
-            Berbagilah pada mereka yang membutuhkan.
-          </p>
+          <p className="text-gray-600">Berbagilah pada mereka yang membutuhkan.</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           {campaigns.map((campaign) => {
-            // Ambil gambar pertama dari array images
-            const firstImage = campaign.images && campaign.images.length > 0
-              ? `https://express-production-51f2.up.railway.app/${campaign.images[0]}`
-              : "https://via.placeholder.com/150"; // Fallback image jika tidak ada gambar
+            // Ensure proper image URL handling
+            const firstImage = campaign.images?.length > 0
+              ? `https://express-production-51f2.up.railway.app${campaign.images[0]}`
+              : "https://via.placeholder.com/300"; // Fallback image
 
             return (
               <Link
@@ -167,14 +165,15 @@ const ProgramKerja = () => {
                 <img
                   src={firstImage}
                   alt={campaign.title}
-                  className="w-full h-48 object-cover rounded-t-lg"
+                  className="w-full h-48 object-contain rounded-t-lg"
+                  onError={(e) => (e.target.src = "https://via.placeholder.com/300")}
                 />
                 <div className="p-6">
                   <h3 className="text-lg font-semibold text-gray-800 mb-4">{campaign.title}</h3>
-                  <p className="text-gray-600 mb-4">{campaign.detail}</p>
+                  <p className="text-gray-600 mb-4">{campaign.detail || "Deskripsi tidak tersedia."}</p>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-500">Target: Rp {campaign.target.toLocaleString()}</span>
-                    <span className="text-sm text-gray-500">Terkumpul: Rp {campaign.currentAmount.toLocaleString()}</span>
+                    <span className="text-sm text-gray-500">🎯 Target: Rp {campaign.target.toLocaleString()}</span>
+                    <span className="text-sm text-gray-500">💰 Terkumpul: Rp {campaign.currentAmount.toLocaleString()}</span>
                   </div>
                 </div>
               </Link>
@@ -185,6 +184,7 @@ const ProgramKerja = () => {
     </FadeInComponent>
   );
 };
+
 
 // Komponen Utama
 const HomePage = () => {

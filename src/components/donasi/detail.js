@@ -143,7 +143,7 @@ const DonationDetailPage = () => {
                     <img
                       src={`${baseUrl}${image}`}
                       alt={`Campaign Image ${index + 1}`}
-                      className="w-full h-64 lg:h-96 object-cover rounded-lg"
+                      className="w-full h-64 lg:h-96 object-contain rounded-lg"
                     />
                   </SwiperSlide>
                 ))
