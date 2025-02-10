@@ -11,7 +11,7 @@ import 'swiper/css/pagination';
 import { Navigation, Pagination } from 'swiper/modules';
 
 // Base URL API
-const baseUrl = 'https://express-production-51f2.up.railway.app';
+const baseUrl = 'https://api2donation.syakiramutiara.my.id/';
 
 const DonationDetailPage = () => {
   const { id } = useParams();

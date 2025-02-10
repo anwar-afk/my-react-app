@@ -1,12 +1,15 @@
 import axios from 'axios';
 
-const API_URL = 'https://express-production-51f2.up.railway.app/api/campaigns'; // Sesuaikan dengan URL API Anda
-
-// Fungsi untuk mengambil semua campaign
+const baseUrl = 'https://api2donation.syakiramutiara.my.id/api';
 export const getCampaigns = async () => {
   try {
-    const response = await axios.get(API_URL);
-    return response.data;
+    const token = localStorage.getItem('token');
+    const response = await axios.get(`${baseUrl}/campaigns`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    return response.data.data;
   } catch (error) {
     throw error.response.data;
   }

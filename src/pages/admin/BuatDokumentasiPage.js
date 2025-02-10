@@ -38,7 +38,7 @@ const BuatDokumentasiPage = () => {
 
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "https://express-production-51f2.up.railway.app/api/documentations",
+        "https://api2donation.syakiramutiara.my.id/api/documentations",
         formData,
         {
           headers: {

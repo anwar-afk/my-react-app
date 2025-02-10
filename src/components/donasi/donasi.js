@@ -4,7 +4,7 @@ import axios from "axios";
 import { useSpring, animated } from "@react-spring/web";
 import { useInView } from "react-intersection-observer";
 
-const baseUrl = "https://express-production-51f2.up.railway.app";
+const baseUrl = "https://api2donation.syakiramutiara.my.id/api";
 
 export const DonasiHeader = () => {
   const { ref, inView } = useInView({ triggerOnce: true });
@@ -40,7 +40,7 @@ export const DonasiContent = () => {
   useEffect(() => {
     const fetchCampaigns = async () => {
       try {
-        const response = await axios.get(`${baseUrl}/api/campaigns`);
+        const response = await axios.get(`${baseUrl}/campaigns`);
         setCampaigns(response.data);
       } catch (error) {
         console.error("Error fetching campaigns:", error);

@@ -153,7 +153,7 @@ const ProgramKerja = () => {
           {campaigns.map((campaign) => {
             // Ensure proper image URL handling
             const firstImage = campaign.images?.length > 0
-              ? `https://express-production-51f2.up.railway.app${campaign.images[0]}`
+              ? `https://api2donation.syakiramutiara.my.id/${campaign.images[0]}`
               : "https://via.placeholder.com/300"; // Fallback image
 
             return (

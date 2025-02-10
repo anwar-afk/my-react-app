@@ -186,7 +186,7 @@ const Album = () => {
                     {doc.images.map((image, index) => (
                       <SwiperSlide key={index}>
                         <img
-                          src={`https://express-production-51f2.up.railway.app${image}`}
+                          src={`http://api2donation.syakiramutiara.my.id/${image}`}
                           alt={`${doc.title} - ${index + 1}`}
                           className="w-full h-48 object-cover"
                         />

@@ -1,7 +1,7 @@
 // services/statisticService.js
 import axios from 'axios';
 
-const baseUrl = 'https://express-production-51f2.up.railway.app/api';
+const baseUrl = 'https://api2donation.syakiramutiara.my.id/api';
 
 export const getStatistics = async () => {
   try {

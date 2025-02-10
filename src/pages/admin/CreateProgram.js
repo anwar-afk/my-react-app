@@ -59,11 +59,12 @@ const CreateProgram = () => {
     try {
       // Kirim data ke backend
       const response = await axios.post(
-        'https://express-production-51f2.up.railway.app/api/campaigns',
+        'https://api2donation.syakiramutiara.my.id/api/campaigns', // Pastikan URL ini benar
         data,
         {
           headers: {
             'Content-Type': 'multipart/form-data', // Penting untuk mengirim file
+            Authorization: `Bearer ${localStorage.getItem('token')}`, // Jika memerlukan token
           },
         }
       );

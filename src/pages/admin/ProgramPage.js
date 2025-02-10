@@ -12,7 +12,7 @@ const ProgramPage = () => {
   const token = localStorage.getItem('token');
 
   // Base URL API
-  const baseUrl = 'https://express-production-51f2.up.railway.app';
+  const baseUrl = 'https://api2donation.syakiramutiara.my.id/';
 
   // Fungsi untuk mengambil data campaigns
   const fetchCampaigns = async () => {
