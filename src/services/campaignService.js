@@ -9,8 +9,8 @@ export const getCampaigns = async () => {
         Authorization: `Bearer ${token}`
       }
     });
-    return response.data.data;
+    return response.data;
   } catch (error) {
-    throw error.response.data;
+    throw error.response;
   }
 };

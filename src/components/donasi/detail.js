@@ -10,8 +10,8 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Navigation, Pagination } from 'swiper/modules';
 
-// Base URL API
-const baseUrl = 'https://api2donation.syakiramutiara.my.id/';
+// Base API URL
+const baseUrl = 'https://api2donation.syakiramutiara.my.id';
 
 const DonationDetailPage = () => {
   const { id } = useParams();
@@ -30,29 +30,42 @@ const DonationDetailPage = () => {
     config: { duration: 1000 },
   });
 
-  // Ambil data campaign dan riwayat donasi saat komponen dimuat
+  // Fetch campaign and donation history
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Ambil data campaign
-        const campaignData = await getCampaigns();
-        const selectedCampaign = campaignData.find((campaign) => campaign._id === id);
-        if (selectedCampaign) {
-          setCampaign(selectedCampaign);
+        // ✅ Fetch campaigns and extract the correct campaign by `id`
+        const response = await getCampaigns();
+        console.log("✅ Fetched campaigns:", response);
+
+        if (response && response.campaigns && Array.isArray(response.campaigns)) {
+          const selectedCampaign = response.campaigns.find((campaign) => campaign.id.toString() === id);
+          if (selectedCampaign) {
+            setCampaign(selectedCampaign);
+          } else {
+            setError("Data campaign tidak ditemukan.");
+          }
         } else {
-          setError("Data campaign tidak ditemukan.");
+          console.error("🚨 Unexpected response format:", response);
+          setError("Format respons tidak sesuai.");
         }
 
-        // Ambil riwayat donasi jika user sudah login
+        // ✅ Fetch donation history if user is logged in
         if (user) {
           const historyData = await getDonationHistory();
-          setDonationHistory(historyData);
+          
+          if (historyData.error) {
+            console.error("🚨 Error fetching history:", historyData.error);
+            setDonationHistory([]); // Avoid crashes
+          } else {
+            setDonationHistory(historyData);
+          }
         }
 
-        setLoading(false);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("❌ Error fetching data:", error);
         setError("Gagal memuat data.");
+      } finally {
         setLoading(false);
       }
     };
@@ -87,15 +100,20 @@ const DonationDetailPage = () => {
     }
 
     try {
-      const response = await createDonation(id, amount);
-      if (response.success) {
-        window.location.href = response.paymentUrl;
+      console.log("🔼 Sending donation request:", { campaignId: id, amount: Number(amount) });
+
+      const response = await createDonation(id, Number(amount));
+
+      console.log("✅ Donation response:", response);
+
+      if (response.success && response.paymentUrl) {
+        window.location.href = response.paymentUrl; // Redirect to payment page
       } else {
-        setDonationError("Gagal membuat donasi. Silakan coba lagi.");
+        setDonationError(response.message || "Gagal membuat donasi. Silakan coba lagi.");
       }
     } catch (error) {
-      console.error("Error creating donation:", error);
-      setDonationError(error.message || "Terjadi kesalahan saat membuat donasi.");
+      console.error("❌ Error creating donation:", error);
+      setDonationError(error.response?.data?.message || "Terjadi kesalahan saat membuat donasi.");
     }
   };
 
@@ -141,7 +159,7 @@ const DonationDetailPage = () => {
                 campaign.images.map((image, index) => (
                   <SwiperSlide key={index}>
                     <img
-                      src={`${baseUrl}${image}`}
+                      src={`${baseUrl}${image}`} // ✅ Fix image URL
                       alt={`Campaign Image ${index + 1}`}
                       className="w-full h-64 lg:h-96 object-contain rounded-lg"
                     />
@@ -162,99 +180,34 @@ const DonationDetailPage = () => {
             <span className="text-sm text-green-600 bg-green-100 px-3 py-1 rounded-full">{campaign.category}</span>
             <h2 className="text-2xl lg:text-3xl font-bold text-gray-800 mt-4">{campaign.title}</h2>
             <p className="text-gray-600 mt-4 text-lg leading-relaxed">{campaign.detail}</p>
-            <button onClick={openModal} className="w-full mt-6 px-6 py-3 bg-green-500 text-white text-lg rounded-full shadow-md hover:bg-green-600 transform hover:scale-105 transition-all duration-300">
+            <button onClick={openModal} className="w-full mt-6 px-6 py-3 bg-green-500 text-white text-lg rounded-full shadow-md hover:bg-green-600">
               Donasi Sekarang
             </button>
           </div>
         </div>
-
-        {/* Riwayat Donasi */}
-        <section className="mt-12">
-          <h3 className="text-2xl font-bold text-gray-800">Riwayat Donasi</h3>
-          <div className="mt-6 space-y-6">
-            {user ? (
-              donationHistory.filter((donation) => donation.paymentStatus === 'success').length > 0 ? (
-                donationHistory
-                  .filter((donation) => donation.paymentStatus === 'success')
-                  .map((donation) => (
-                    <div key={donation._id} className="flex justify-between items-center border-b pb-4">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                          <i className="fas fa-user text-gray-600"></i>
-                        </div>
-                        <div>
-                          <p className="text-gray-800 font-semibold">Anda</p>
-                          <p className="text-sm text-gray-600">
-                            {new Date(donation.createdAt).toLocaleDateString()}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            Status: {donation.paymentStatus}
-                          </p>
-                        </div>
-                      </div>
-                      <p className="text-green-600 font-bold">
-                        Rp. {donation.amount.toLocaleString()}
-                      </p>
-                    </div>
-                  ))
-              ) : (
-                <p className="text-gray-600">Belum ada donasi yang berhasil.</p>
-              )
-            ) : (
-              <p className="text-gray-600">Login dan lihat riwayat donasi kamu.</p>
-            )}
-          </div>
-        </section>
-
-        {!user && (
-          <div className="mt-8">
-            <Link
-              to="/login"
-              className="px-6 py-3 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transform hover:scale-105 transition-all duration-300"
-            >
-              Login untuk Donasi
-            </Link>
-          </div>
-        )}
       </main>
 
-      {/* Modal untuk Donasi */}
+      {/* Modal Donasi */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Donasi Sekarang</h2>
             <form onSubmit={handleDonationSubmit}>
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="amount">
-                  Jumlah Donasi (Rp)
-                </label>
+                <label className="block text-gray-700 text-sm font-bold mb-2">Jumlah Donasi (Rp)</label>
                 <input
                   type="number"
-                  id="amount"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   placeholder="Masukkan jumlah donasi"
                   required
                 />
               </div>
-              {donationError && (
-                <p className="text-red-500 text-sm mb-4">{donationError}</p>
-              )}
+              {donationError && <p className="text-red-500 text-sm mb-4">{donationError}</p>}
               <div className="flex justify-end space-x-4">
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-                >
-                  Donasi
-                </button>
+                <button onClick={closeModal} className="px-4 py-2 bg-gray-500 text-white rounded-lg">Batal</button>
+                <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded-lg">Donasi</button>
               </div>
             </form>
           </div>

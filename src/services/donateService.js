@@ -1,43 +1,71 @@
 import axios from 'axios';
 
-const API_URL = 'https://api2donation.syakiramutiara.my.id/api'; // Sesuaikan dengan URL API Anda
+const baseUrl = 'https://api2donation.syakiramutiara.my.id/api';
 
-// Fungsi untuk membuat donasi
+// ✅ Function to create a donation
 export const createDonation = async (campaignId, amount) => {
   try {
-    const response = await axios.post(
-      `${API_URL}/donate`,
-      {
-        campaignId, // ID campaign yang sedang dibuka
-        amount: parseInt(amount), // Konversi amount ke number
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`, // Jika memerlukan token
-        },
-      }
-    );
+    const token = localStorage.getItem('token'); // ✅ Ensure token exists
+    if (!token) {
+      console.warn("⚠️ No authentication token found!");
+      return { error: "User not logged in." };
+    }
 
-    return response.data; // Mengembalikan respons dari API
-  } catch (error) {
-    console.error("Error creating donation:", error);
-    throw error.response?.data || "Terjadi kesalahan saat membuat donasi."; // Lempar error untuk ditangani di komponen
-  }
-};
+    const donationData = { campaignId, amount: parseInt(amount) }; // ✅ Convert amount to number
 
-// Fungsi untuk mengambil riwayat donasi
-export const getDonationHistory = async () => {
-  try {
-    const response = await axios.get(`${API_URL}/donations/history`, {
+    console.log("🔼 Sending donation request:", donationData);
+
+    const response = await axios.post(`${baseUrl}/donate`, donationData, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`, // Jika memerlukan token
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`, // ✅ Include token for authentication
       },
     });
 
-    return response.data; // Mengembalikan data riwayat donasi
+    console.log("✅ Donation response:", response.data);
+
+    return response.data; // ✅ Return API response
   } catch (error) {
-    console.error("Error fetching donation history:", error);
-    throw error.response?.data || "Terjadi kesalahan saat mengambil riwayat donasi."; // Lempar error untuk ditangani di komponen
+    console.error("❌ Error creating donation:", error);
+    
+    if (error.response) {
+      console.error("Server response:", error.response.data);
+    }
+
+    return { error: "Terjadi kesalahan saat membuat donasi. Silakan coba lagi." };
+  }
+};
+
+// ✅ Function to fetch donation history
+export const getDonationHistory = async () => {
+  try {
+    const token = localStorage.getItem('token'); // ✅ Get auth token
+    if (!token) {
+      console.warn("⚠️ No authentication token found!");
+      return { error: "User not logged in." };
+    }
+
+    const response = await axios.get(`${baseUrl}/donations/history`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // ✅ Include token for authentication
+      },
+    });
+
+    console.log("✅ Donation history response:", response.data);
+
+    if (response.data && Array.isArray(response.data.history)) {
+      return response.data.history;
+    } else {
+      console.error("🚨 Unexpected response format:", response.data);
+      return [];
+    }
+  } catch (error) {
+    console.error("❌ Error fetching donation history:", error);
+    
+    if (error.response) {
+      console.error("Server response:", error.response.data);
+    }
+
+    return { error: "Terjadi kesalahan server. Silakan coba lagi." };
   }
 };

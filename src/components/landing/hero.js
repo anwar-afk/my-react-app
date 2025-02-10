@@ -127,16 +127,28 @@ const ProgramKerja = () => {
   useEffect(() => {
     const fetchCampaigns = async () => {
       try {
-        const data = await getCampaigns();
-        const sortedCampaigns = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        setCampaigns(sortedCampaigns.slice(0, 3));
+        const response = await getCampaigns();
+        console.log("Fetched data:", response); // ✅ Debugging: Show API response
+
+        // Ensure campaigns exist and are an array
+        if (response && response.campaigns && Array.isArray(response.campaigns)) {
+          const sortedCampaigns = response.campaigns.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
+          setCampaigns(sortedCampaigns.slice(0, 3)); // Show only the latest 3 campaigns
+        } else {
+          console.error("Unexpected response format:", response);
+          setCampaigns([]); // Avoid crashes by setting an empty array
+        }
       } catch (err) {
+        console.error("Error fetching campaigns:", err);
         setError(err.message || "Terjadi kesalahan saat mengambil data campaign");
       } finally {
         setLoading(false);
       }
     };
-    fetchCampaigns();
+
+    fetchCampaigns(); // ✅ Call the function inside useEffect
   }, []);
 
   if (loading) return <div className="text-center py-10">Loading...</div>;
@@ -151,21 +163,21 @@ const ProgramKerja = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           {campaigns.map((campaign) => {
-            // Ensure proper image URL handling
+            // ✅ Ensure correct image URL handling
             const firstImage = campaign.images?.length > 0
-              ? `https://api2donation.syakiramutiara.my.id/${campaign.images[0]}`
-              : "https://via.placeholder.com/300"; // Fallback image
+              ? `https://api2donation.syakiramutiara.my.id${campaign.images[0]}` // ✅ Remove extra `/`
+              : "https://via.placeholder.com/300"; // ✅ Fallback image
 
             return (
               <Link
-                to={`/donation/${campaign._id}`}
-                key={campaign._id}
+                to={`/donation/${campaign.id}`} // ✅ Correct ID usage
+                key={campaign.id}
                 className="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
               >
                 <img
                   src={firstImage}
                   alt={campaign.title}
-                  className="w-full h-48 object-contain rounded-t-lg"
+                  className="w-full h-48 object-cover rounded-t-lg"
                   onError={(e) => (e.target.src = "https://via.placeholder.com/300")}
                 />
                 <div className="p-6">
@@ -184,7 +196,6 @@ const ProgramKerja = () => {
     </FadeInComponent>
   );
 };
-
 
 // Komponen Utama
 const HomePage = () => {
