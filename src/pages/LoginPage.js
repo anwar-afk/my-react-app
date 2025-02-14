@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { login } from '../services/authService';
 import { AuthContext } from '../context/AuthContext';
+import loginImage from '../assets/login.png';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -115,7 +116,7 @@ const LoginPage = () => {
       {/* Image Section */}
       <div className="w-full md:w-1/2 bg-green-400 flex items-center justify-center p-6 md:p-0">
         <img
-          src="/image/login.png"
+          src={loginImage}
           alt="Login Illustration"
           className="max-w-full h-auto md:max-w-md"
         />
