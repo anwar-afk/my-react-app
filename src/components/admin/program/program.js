@@ -13,11 +13,11 @@ const ProgramPage = () => {
 
   const fetchCampaigns = async () => {
     try {
-      const url = ${baseUrl}/api/campaigns;
+      const url = `${baseUrl}/api/campaigns`; // Use backticks and add semicolon
       console.log('Fetching campaigns from:', url);
       
       const response = await axios.get(url, {
-        headers: { Authorization: Bearer ${token} },
+        headers: { Authorization: `Bearer ${token}` }, // Fix other template literals
       });
   
       console.log('Campaigns response:', response.data);
@@ -42,12 +42,12 @@ const ProgramPage = () => {
 
   const handleCreateProgram = async (data) => {
     try {
-      const url = ${baseUrl}/api/campaigns;
+      const url = `${baseUrl}/api/campaigns`; // Use backticks and add semicolon
       console.log('Creating program at:', url);
       const response = await axios.post(url, data, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          Authorization: Bearer ${token},
+          Authorization: `Bearer ${token}`, // Fix other template literals
         },
       });
       fetchCampaigns();
@@ -62,12 +62,12 @@ const ProgramPage = () => {
 
   const handleUpdateProgram = async (data) => {
     try {
-      const url = ${baseUrl}/api/campaigns/${selectedProgram._id};
+      const url = `${baseUrl}/api/campaigns/${selectedProgram._id}`; // Use backticks and add semicolon
       console.log('Updating program at:', url);
       const response = await axios.put(url, data, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          Authorization: Bearer ${token},
+          Authorization: `Bearer ${token}`, // Fix other template literals
         },
       });
       fetchCampaigns();
@@ -83,11 +83,11 @@ const ProgramPage = () => {
   };
   const handleDeleteProgram = async (campaignId) => {
     try {
-      const url = ${baseUrl}/api/campaigns/${campaignId};
+      const url = `${baseUrl}/api/campaigns/${campaignId}`; // Use backticks and add semicolon
       console.log('Deleting program at:', url);
   
       await axios.delete(url, {
-        headers: { Authorization: Bearer ${token} },
+        headers: { Authorization: `Bearer ${token}` }, // Fix other template literals
       });
   
       fetchCampaigns();
@@ -135,8 +135,8 @@ const ProgramPage = () => {
               ? campaign.images.map((image, index) => (
                   <img
                     key={index}
-                    src={${baseUrl}${image}} // Gabungkan base URL dengan path gambar
-                    alt={Campaign Image ${index + 1}}
+                    src={`${baseUrl}${image}`} // Gabungkan base URL dengan path gambar
+                    alt={`Campaign Image ${index + 1}`}
                     className="w-16 h-16 object-cover rounded-md"
                   />
                 ))

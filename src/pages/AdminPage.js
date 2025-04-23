@@ -4,7 +4,7 @@ import Sidebar from '../components/admin/sidebar/sidebar';
 import Dashboard from '../components/admin/dashboard/dashboard';
 import ProgramPage from '../components/admin/program/program'; // Updated import
 import DokumentasiPage from '../components/admin/dokumentasi/dokumentasi'; // Updated import
-import BuatDokumentasiPage from '../components/admin/dokumentasi/buatDokumentasi'; // Updated import
+import BuatDokumentasiPage from '../components/admin/dokumentasi/buatdokumentasi'; // Match exact filename case
 
 const AdminPage = () => {
   return (

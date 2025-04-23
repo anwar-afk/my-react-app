@@ -48,10 +48,10 @@ const DokumentasiPage = () => {
     try {
       const token = localStorage.getItem("token"); // Ambil token dari localStorage
       await axios.delete(
-        https://api2donation.syakiramutiara.my.id/api/documentations/${documentationId},
+        `https://api2donation.syakiramutiara.my.id/api/documentations/${documentationId}`,
         {
           headers: {
-            Authorization: Bearer ${token}, // Tambahkan token ke header
+            Authorization: `Bearer ${token}`, // Use backticks for template literals
           },
         }
       );
@@ -72,7 +72,7 @@ const DokumentasiPage = () => {
       {/* Tombol "Buat Dokumentasi" */}
       <Link
         to="/admin/dokumentasi/buat"
-        className="mb-6 inline-block px-4 py-2 bg-green-500 text-white font-semibold rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+        className="mb-6 inline-block px-4 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
       >
         Buat Dokumentasi
       </Link>
@@ -99,8 +99,8 @@ const DokumentasiPage = () => {
                   {doc.images.map((image, index) => (
                     <SwiperSlide key={index}>
                       <img
-                        src={https://api2donation.syakiramutiara.my.id/${image}}
-                        alt={Dokumentasi ${index + 1}}
+                        src={`https://api2donation.syakiramutiara.my.id/${image}`}
+                        alt={`Dokumentasi ${index + 1}`}
                         className="w-full h-48 object-cover"
                       />
                     </SwiperSlide>
