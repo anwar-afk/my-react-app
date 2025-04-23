@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import ProgramForm from '../../components/admin/JS_programForm'; // Sesuaikan path
+import ProgramForm from '../JS_programForm'; // Fixed import path
 
 const ProgramPage = () => {
   const [selectedProgram, setSelectedProgram] = useState(null);

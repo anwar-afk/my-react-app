@@ -1,10 +1,10 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Sidebar from '../components/admin/sidebar/sidebar';
-import Dashboard from '../components/admin/dashboard/dashboard'; // Impor Dashboard
-import ProgramPage from './admin/ProgramPage'; // Impor ProgramPage
-import DokumentasiPage from './admin/DokumentasiPage'; // Impor DokumentasiPage
-import BuatDokumentasiPage from './admin/BuatDokumentasiPage'; // Impor BuatDokumentasiPage
+import Dashboard from '../components/admin/dashboard/dashboard';
+import ProgramPage from '../components/admin/program/program'; // Updated import
+import DokumentasiPage from '../components/admin/dokumentasi/dokumentasi'; // Updated import
+import BuatDokumentasiPage from '../components/admin/dokumentasi/buatDokumentasi'; // Updated import
 
 const AdminPage = () => {
   return (
@@ -15,11 +15,11 @@ const AdminPage = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         <Routes>
-          <Route path="dashboard" element={<Dashboard />} /> {/* /admin/dashboard */}
-          <Route path="program" element={<ProgramPage />} /> {/* /admin/program */}
-          <Route path="dokumentasi" element={<DokumentasiPage />} /> {/* /admin/dokumentasi */}
-          <Route path="dokumentasi/buat" element={<BuatDokumentasiPage />} /> {/* /admin/dokumentasi/buat */}
-          <Route index element={<Dashboard />} /> {/* Default route untuk /admin */}
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="program" element={<ProgramPage />} />
+          <Route path="dokumentasi" element={<DokumentasiPage />} />
+          <Route path="dokumentasi/buat" element={<BuatDokumentasiPage />} />
+          <Route index element={<Dashboard />} />
         </Routes>
       </div>
     </div>
