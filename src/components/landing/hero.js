@@ -177,12 +177,14 @@ const ProgramKerja = () => {
                 <img
                   src={firstImage}
                   alt={campaign.title}
-                  className="w-full h-48 object-cover rounded-t-lg"
+                  className="w-full h-64 object-contain rounded-t-lg"
                   onError={(e) => (e.target.src = "https://via.placeholder.com/300")}
                 />
                 <div className="p-6">
                   <h3 className="text-lg font-semibold text-gray-800 mb-4">{campaign.title}</h3>
-                  <p className="text-gray-600 mb-4">{campaign.detail || "Deskripsi tidak tersedia."}</p>
+                  <p className="text-gray-600 mb-4 line-clamp-2">
+                    {campaign.detail || "Deskripsi tidak tersedia."}
+                  </p>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-500">🎯 Target: Rp {campaign.target.toLocaleString()}</span>
                     <span className="text-sm text-gray-500">💰 Terkumpul: Rp {campaign.currentAmount.toLocaleString()}</span>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import { getCampaigns } from '../../services/campaignService'; // Updated import
 import { useSpring, animated } from "@react-spring/web";
 import { useInView } from "react-intersection-observer";
 
@@ -37,23 +37,29 @@ export const DonasiContent = () => {
   const [campaigns, setCampaigns] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [showAll, setShowAll] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const categories = ["bencana alam", "pendidikan", "kesehatan", "kemanusiaan", "lingkungan", "lainnya"];
 
   useEffect(() => {
     const fetchCampaigns = async () => {
       try {
-        const response = await axios.get(`${baseUrl}/campaigns`);
-        console.log("Fetched campaigns:", response.data); // ✅ Debugging: Show API response
-        
-        // ✅ Extract campaigns properly
-        if (response.data && response.data.campaigns && Array.isArray(response.data.campaigns)) {
-          setCampaigns(response.data.campaigns);
+        const response = await getCampaigns();
+        console.log("Fetched data:", response); // ✅ Debugging: Show API response
+
+        // Ensure campaigns exist and are an array
+        if (response && response.campaigns && Array.isArray(response.campaigns)) {
+          // Don't limit to 3 campaigns for the donation page
+          setCampaigns(response.campaigns);
         } else {
-          console.error("Unexpected response format:", response.data);
-          setCampaigns([]); // Prevent crashes
+          console.error("Unexpected response format:", response);
+          setCampaigns([]); // Avoid crashes by setting an empty array
         }
-      } catch (error) {
-        console.error("Error fetching campaigns:", error);
+      } catch (err) {
+        console.error("Error fetching campaigns:", err);
+        setError(err.message || "Terjadi kesalahan saat mengambil data campaign");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -64,6 +70,9 @@ export const DonasiContent = () => {
     (selectedCategory === "all" || campaign.category === selectedCategory) &&
     new Date(campaign.endDate) > new Date()
   );
+
+  if (loading) return <div className="text-center py-10">Loading...</div>;
+  if (error) return <div className="text-center py-10 text-red-600">Error: {error}</div>;
 
   return (
     <div id="donasi-content" className="px-6 lg:px-40 py-10">
