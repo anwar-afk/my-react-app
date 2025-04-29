@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseUrl = 'https://api2donation.syakiramutiara.my.id/api';
+const baseUrl = "http://localhost:8000/api";
 export const getCampaigns = async () => {
   try {
     const token = localStorage.getItem('token');

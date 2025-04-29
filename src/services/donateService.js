@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseUrl = 'https://api2donation.syakiramutiara.my.id/api';
+const baseUrl = "http://localhost:8000/api";
 
 // ✅ Function to create a donation
 export const createDonation = async (campaignId, amount) => {

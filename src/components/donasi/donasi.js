@@ -4,7 +4,7 @@ import axios from "axios";
 import { useSpring, animated } from "@react-spring/web";
 import { useInView } from "react-intersection-observer";
 
-const baseUrl = "https://api2donation.syakiramutiara.my.id/api";
+const baseUrl = "http://localhost:8000/api";
 
 export const DonasiHeader = () => {
   const { ref, inView } = useInView({ triggerOnce: true });

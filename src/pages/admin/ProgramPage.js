@@ -9,7 +9,7 @@ const ProgramPage = () => {
   const [notification, setNotification] = useState(null);
 
   const token = localStorage.getItem('token');
-  const baseUrl = 'https://api2donation.syakiramutiara.my.id';
+  const baseUrl = "http://localhost:8000";
 
   const fetchCampaigns = async () => {
     try {
