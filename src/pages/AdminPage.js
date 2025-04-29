@@ -1,12 +1,19 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 import Sidebar from '../components/admin/sidebar/sidebar';
 import Dashboard from '../components/admin/dashboard/dashboard';
-import ProgramPage from '../components/admin/program/program'; // Updated import
-import DokumentasiPage from '../components/admin/dokumentasi/dokumentasi'; // Updated import
-import BuatDokumentasiPage from '../components/admin/dokumentasi/buatDokumentasi'; // Updated import
+import ProgramPage from '../components/admin/program/program';
+import DokumentasiPage from '../components/admin/dokumentasi/dokumentasi';
+import BuatDokumentasiPage from '../components/admin/dokumentasi/buatDokumentasi';
 
 const AdminPage = () => {
+  const { user } = useContext(AuthContext);
+  
+  // Default profile image if user doesn't have one
+  const profileImage = user?.profileImage || '/image/default-avatar.png';
+  const adminName = user?.name || 'Admin';
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
@@ -14,13 +21,30 @@ const AdminPage = () => {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        <Routes>
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="program" element={<ProgramPage />} />
-          <Route path="dokumentasi" element={<DokumentasiPage />} />
-          <Route path="dokumentasi/buat" element={<BuatDokumentasiPage />} />
-          <Route index element={<Dashboard />} />
-        </Routes>
+        {/* Header */}
+        <header className="bg-white shadow-sm p-4 flex justify-end items-center">
+          <div className="flex items-center">
+            <span className="mr-3 text-gray-700">Admin, {adminName}</span>
+            <div className="w-10 h-10 rounded-full overflow-hidden">
+              <img 
+                src={profileImage} 
+                alt="Profile" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </header>
+
+        {/* Content */}
+        <main className="flex-1">
+          <Routes>
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="program" element={<ProgramPage />} />
+            <Route path="dokumentasi" element={<DokumentasiPage />} />
+            <Route path="dokumentasi/buat" element={<BuatDokumentasiPage />} />
+            <Route index element={<Dashboard />} />
+          </Routes>
+        </main>
       </div>
     </div>
   );

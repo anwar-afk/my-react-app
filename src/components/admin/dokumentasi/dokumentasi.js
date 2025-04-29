@@ -1,39 +1,32 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-// Import Swiper React components
-import { Swiper, SwiperSlide } from "swiper/react";
-// Import Swiper styles
-import "swiper/css";
-import "swiper/css/pagination";
-import "swiper/css/navigation";
-// Import required modules
-import { Pagination, Navigation } from "swiper/modules";
 
 const DokumentasiPage = () => {
-  const [documentations, setDocumentations] = useState([]); // State untuk menyimpan data dokumentasi
-  const [loading, setLoading] = useState(true); // State untuk loading
-  const [error, setError] = useState(null); // State untuk error
+  const [documentations, setDocumentations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [notification, setNotification] = useState(null);
 
-  // Fetch semua data dokumentasi
+  // Fetch all documentation data
   useEffect(() => {
     const fetchDocumentations = async () => {
       try {
         const response = await axios.get(
           "https://api2donation.syakiramutiara.my.id/api/documentations"
         );
-        setDocumentations(response.data); // Simpan data ke state
-        setLoading(false); // Set loading ke false setelah data diterima
+        setDocumentations(response.data);
+        setLoading(false);
       } catch (err) {
-        setError(err.message); // Tangani error
-        setLoading(false); // Set loading ke false meskipun ada error
+        setError(err.message);
+        setLoading(false);
       }
     };
 
     fetchDocumentations();
   }, []);
 
-  // Fungsi untuk memformat tanggal
+  // Format date function
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("id-ID", {
@@ -43,93 +36,101 @@ const DokumentasiPage = () => {
     });
   };
 
-  // Fungsi untuk menghapus dokumentasi
+  // Delete documentation function
   const handleDeleteDocumentation = async (documentationId) => {
-    try {
-      const token = localStorage.getItem("token"); // Ambil token dari localStorage
-      await axios.delete(
-        `https://api2donation.syakiramutiara.my.id/api/documentations/${documentationId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // Tambahkan token ke header
-          },
-        }
-      );
-      // Perbarui state dengan menghapus dokumentasi yang telah dihapus
-      setDocumentations(documentations.filter(doc => doc._id !== documentationId));
-    } catch (err) {
-      console.error("Error deleting documentation:", err);
+    if (window.confirm("Apakah Anda yakin ingin menghapus dokumentasi ini?")) {
+      try {
+        const token = localStorage.getItem("token");
+        await axios.delete(
+          `https://api2donation.syakiramutiara.my.id/api/documentations/${documentationId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        
+        // Update state by removing the deleted documentation
+        setDocumentations(documentations.filter(doc => doc._id !== documentationId));
+        
+        // Show success notification
+        showNotification("Dokumentasi berhasil dihapus!", "success");
+      } catch (err) {
+        console.error("Error deleting documentation:", err);
+        showNotification("Gagal menghapus dokumentasi.", "error");
+      }
     }
   };
 
-  return (
-    <div className="flex-1 p-8">
-      <h1 className="text-3xl font-bold mb-6">Dokumentasi Page</h1>
-      <p className="text-gray-700 mb-6">
-        Ini adalah halaman untuk mengelola dokumentasi.
-      </p>
+  // Show notification function
+  const showNotification = (message, type) => {
+    setNotification({ message, type });
+    setTimeout(() => {
+      setNotification(null);
+    }, 3000);
+  };
 
-      {/* Tombol "Buat Dokumentasi" */}
+  return (
+    <div className="flex-1 p-8 bg-gray-100">
+      <h1 className="text-3xl font-bold text-gray-800 mb-6">Dokumentasi</h1>
+
+      {/* Notification */}
+      {notification && (
+        <div
+          className={`mb-4 p-3 rounded-md ${
+            notification.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+          }`}
+        >
+          {notification.message}
+        </div>
+      )}
+
+      {/* Create Documentation Button */}
       <Link
         to="/admin/dokumentasi/buat"
-        className="mb-6 inline-block px-4 py-2 bg-green-500 text-white font-semibold rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+        className="mb-6 inline-block px-4 py-2 bg-yellow-100 text-gray-800 rounded-md hover:bg-yellow-200 transition-colors"
       >
-        Buat Dokumentasi
+        + Buat Dokumentasi
       </Link>
 
-      {/* Tampilkan data dokumentasi */}
       {loading ? (
-        <p>Loading...</p>
+        <div className="text-center py-10">Loading...</div>
       ) : error ? (
-        <p className="text-red-500">Error: {error}</p>
-      ) : documentations.length > 0 ? (
+        <div className="text-center py-10 text-red-600">Error: {error}</div>
+      ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {documentations.map((doc) => (
-            <div key={doc._id} className="bg-white rounded-lg shadow-md overflow-hidden">
-              {/* Swiper untuk menampilkan gambar */}
-              {doc.images.length > 0 && (
-                <Swiper
-                  pagination={{
-                    type: "fraction",
-                  }}
-                  navigation={true}
-                  modules={[Pagination, Navigation]}
-                  className="mySwiper"
-                >
-                  {doc.images.map((image, index) => (
-                    <SwiperSlide key={index}>
-                      <img
-                        src={`https://api2donation.syakiramutiara.my.id/${image}`}
-                        alt={`Dokumentasi ${index + 1}`}
-                        className="w-full h-48 object-cover"
-                      />
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
+            <div key={doc._id} className="bg-white rounded-lg shadow-sm overflow-hidden">
+              {/* Documentation Image */}
+              {doc.images && doc.images.length > 0 && (
+                <div className="h-48 overflow-hidden">
+                  <img
+                    src={`https://api2donation.syakiramutiara.my.id${doc.images[0]}`}
+                    alt={doc.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               )}
-
-              {/* Detail dokumentasi */}
+              
+              {/* Documentation Details */}
               <div className="p-4">
-                <h2 className="text-xl font-semibold mb-2">{doc.title}</h2>
-                <p className="text-sm text-gray-500">
-                  Tanggal: {formatDate(doc.date)}
-                </p>
-                <p className="text-sm text-gray-500">
-                  Dibuat pada: {formatDate(doc.createdAt)}
-                </p>
-                {/* Tombol Delete */}
+                <h3 className="text-lg font-medium text-gray-800 mb-2">{doc.title}</h3>
+                <div className="text-sm text-gray-600 mb-4">
+                  <p>Tanggal: {formatDate(doc.date)}</p>
+                  <p>Dibuat pada: {formatDate(doc.createdAt)}</p>
+                </div>
+                
+                {/* Delete Button */}
                 <button
                   onClick={() => handleDeleteDocumentation(doc._id)}
-                  className="mt-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+                  className="px-4 py-1 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
                 >
-                  Delete
+                  Hapus
                 </button>
               </div>
             </div>
           ))}
         </div>
-      ) : (
-        <p className="text-gray-500">Tidak ada dokumentasi.</p>
       )}
     </div>
   );

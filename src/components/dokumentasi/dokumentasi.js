@@ -1,33 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { useSpring, animated } from "@react-spring/web";
 import axios from "axios";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
 
 const Album = () => {
   const [documentations, setDocumentations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const currentDate = new Date();
-  const maxYear = currentDate.getFullYear();
-  const [currentYear, setCurrentYear] = useState(2025);
-  const [currentMonth, setCurrentMonth] = useState(currentDate.getMonth());
-
-  const months = [
-    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-  ];
+  const [selectedYear, setSelectedYear] = useState("ALL");
+  const [currentImageIndexes, setCurrentImageIndexes] = useState({});
 
   // Fetch data dokumentasi dari API
   useEffect(() => {
     const fetchDocumentations = async () => {
       try {
         const response = await axios.get(
-          "https://express-production-51f2.up.railway.app/api/documentations"
+          "https://api2donation.syakiramutiara.my.id/api/documentations"
         );
         setDocumentations(response.data);
         setLoading(false);
@@ -39,40 +26,6 @@ const Album = () => {
 
     fetchDocumentations();
   }, []);
-
-  const handleNextYear = () => {
-    if (currentYear < maxYear) {
-      setCurrentYear(currentYear + 1);
-    }
-  };
-
-  const handlePrevYear = () => {
-    if (currentYear > 2024) {
-      setCurrentYear(currentYear - 1);
-    }
-  };
-
-  const handleNextMonth = () => {
-    if (currentMonth < 11) {
-      setCurrentMonth(currentMonth + 1);
-    } else {
-      if (currentYear < maxYear) {
-        setCurrentMonth(0);
-        setCurrentYear(currentYear + 1);
-      }
-    }
-  };
-
-  const handlePrevMonth = () => {
-    if (currentMonth > 0) {
-      setCurrentMonth(currentMonth - 1);
-    } else {
-      if (currentYear > 2024) {
-        setCurrentMonth(11);
-        setCurrentYear(currentYear - 1);
-      }
-    }
-  };
 
   const fadeProps = useSpring({
     from: { opacity: 0 },
@@ -89,136 +42,137 @@ const Album = () => {
     });
   };
 
-  // Filter dokumentasi berdasarkan tahun dan bulan
+  // Function to handle next image
+  const handleNextImage = (docId) => {
+    setCurrentImageIndexes((prevIndexes) => {
+      const currentIndex = prevIndexes[docId] || 0;
+      const doc = documentations.find(d => d._id === docId);
+      const maxIndex = doc.images.length - 1;
+      return {
+        ...prevIndexes,
+        [docId]: currentIndex >= maxIndex ? 0 : currentIndex + 1
+      };
+    });
+  };
+
+  // Function to handle previous image
+  const handlePrevImage = (docId) => {
+    setCurrentImageIndexes((prevIndexes) => {
+      const currentIndex = prevIndexes[docId] || 0;
+      const doc = documentations.find(d => d._id === docId);
+      const maxIndex = doc.images.length - 1;
+      return {
+        ...prevIndexes,
+        [docId]: currentIndex <= 0 ? maxIndex : currentIndex - 1
+      };
+    });
+  };
+
+  // Filter dokumentasi berdasarkan tahun
   const filteredDocumentations = documentations.filter((doc) => {
-    const docDate = new Date(doc.date);
-    return (
-      docDate.getFullYear() === currentYear &&
-      docDate.getMonth() === currentMonth
-    );
+    if (selectedYear === "ALL") return true;
+    
+    const docYear = new Date(doc.date).getFullYear().toString();
+    return docYear === selectedYear;
   });
 
-  return (
-    <animated.div style={fadeProps} className="bg-white text-gray-800 min-h-screen px-6 lg:px-40 py-10">
-      {/* Header */}
-      <div className="border-b border-gray-300 pb-6">
-        <h1 className="text-3xl font-bold mb-2">Dokumentasi</h1>
-        <div className="flex justify-between items-center">
-          <p className="text-gray-500">Foto</p>
-        </div>
-      </div>
+  // Mendapatkan tahun unik dari dokumentasi
+  const getYears = () => {
+    const years = documentations.map(doc => new Date(doc.date).getFullYear().toString());
+    return ["ALL", ...new Set(years)].sort();
+  };
 
-      {/* Year Section */}
-      <div className="mt-10">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-4xl font-bold">{currentYear}</h2>
-          <div className="flex gap-4">
-            <button
-              onClick={handlePrevYear}
-              className={`p-2 rounded-full hover:bg-gray-100 transition-colors ${
-                currentYear <= 2024 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600'
-              }`}
-              disabled={currentYear <= 2024}
-            >
-              <span className="material-icons">Tahun sebelumnya</span>
-            </button>
-            <button
-              onClick={handleNextYear}
-              className={`p-2 rounded-full hover:bg-gray-100 transition-colors ${
-                currentYear >= maxYear ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600'
-              }`}
-              disabled={currentYear >= maxYear}
-            >
-              <span className="material-icons">Tahun setelahnya</span>
-            </button>
-          </div>
-        </div>
-        <p className="text-gray-600 text-lg">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+  if (loading) return <div className="text-center py-20">Loading...</div>;
+  if (error) return <div className="text-center py-20 text-red-600">Error: {error}</div>;
+
+  return (
+    <animated.div style={fadeProps} className="container mx-auto px-4 py-12">
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold text-gray-800 mb-4">Dokumentasi</h1>
+        <p className="text-gray-600 max-w-2xl mx-auto">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
+          aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
+          magna aliqua.
         </p>
       </div>
 
-      {/* Month Section */}
-      <div className="mt-10 border-b border-gray-300 pb-6">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-2xl font-semibold">{months[currentMonth]}</h3>
-          <div className="flex gap-4">
-            <button
-              onClick={handlePrevMonth}
-              className={`p-2 rounded-full hover:bg-gray-100 transition-colors ${
-                currentYear === 2024 && currentMonth === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600'
-              }`}
-              disabled={currentYear === 2024 && currentMonth === 0}
-            >
-              <span className="material-icons">chevron_left</span>
-            </button>
-            <button
-              onClick={handleNextMonth}
-              className={`p-2 rounded-full hover:bg-gray-100 transition-colors ${
-                currentYear === maxYear && currentMonth === currentDate.getMonth() ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600'
-              }`}
-              disabled={currentYear === maxYear && currentMonth === currentDate.getMonth()}
-            >
-              <span className="material-icons">chevron_right</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Tampilkan dokumentasi */}
-        {loading ? (
-          <div className="flex justify-center items-center h-48">
-            <p className="text-gray-600">Memuat dokumentasi...</p>
-          </div>
-        ) : error ? (
-          <p className="text-red-500">Error: {error}</p>
-        ) : filteredDocumentations.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredDocumentations.map((doc) => (
-              <div key={doc._id} className="bg-gray-100 rounded-lg overflow-hidden shadow-md">
-                <div className="relative">
-                  {/* Swiper untuk multiple images */}
-                  <Swiper
-                    modules={[Navigation, Pagination]}
-                    navigation
-                    pagination={{ clickable: true }}
-                    className="w-full h-48"
-                  >
-                    {doc.images.map((image, index) => (
-                      <SwiperSlide key={index}>
-                        <img
-                          src={`http://api2donation.syakiramutiara.my.id/${image}`}
-                          alt={`${doc.title} - ${index + 1}`}
-                          className="w-full h-48 object-cover"
-                        />
-                      </SwiperSlide>
-                    ))}
-                  </Swiper>
-                  <span className="absolute top-3 left-3 bg-gray-700 text-white text-xs px-2 py-1 rounded">
-                    {doc.title}
-                  </span>
-                </div>
-                <div className="p-4">
-                  <h4 className="text-lg font-semibold">{doc.title}</h4>
-                  <p className="text-sm text-gray-500 mt-4 flex items-center">
-                    <span className="material-icons text-sm mr-2">calendar_today</span>
-                    {formatDate(doc.date)}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-gray-500">Tidak ada dokumentasi untuk bulan ini.</p>
-        )}
+      {/* Filter tahun */}
+      <div className="flex justify-center space-x-4 mb-12">
+        {getYears().map((year) => (
+          <button
+            key={year}
+            onClick={() => setSelectedYear(year)}
+            className={`px-8 py-2 rounded-full border ${
+              selectedYear === year
+                ? "bg-green-500 text-white border-green-500"
+                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+            } transition-colors duration-300`}
+          >
+            {year}
+          </button>
+        ))}
       </div>
 
-      {/* Load More Button */}
-      {/* <div className="flex justify-center mt-10">
-        <button className="flex items-center text-green-500 font-semibold hover:underline">
-          <span className="mr-2 material-icons">arrow_forward</span>
-          Lihat Lebih Banyak
-        </button>
-      </div> */}
+      {selectedYear !== "ALL" && (
+        <h2 className="text-3xl font-bold text-gray-800 mb-8">{selectedYear}</h2>
+      )}
+
+      {/* Grid dokumentasi */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {filteredDocumentations.map((doc) => {
+          const currentImageIndex = currentImageIndexes[doc._id] || 0;
+          
+          return (
+            <div key={doc._id} className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
+              <div className="relative">
+                {doc.images && doc.images.length > 0 && (
+                  <div className="relative">
+                    <img
+                      src={`https://api2donation.syakiramutiara.my.id${doc.images[currentImageIndex]}`}
+                      alt={doc.title}
+                      className="w-full h-64 object-contain"
+                    />
+                    {doc.images.length > 1 && (
+                      <div className="absolute inset-0 flex items-center justify-between px-2">
+                        <button 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handlePrevImage(doc._id);
+                          }}
+                          className="bg-white bg-opacity-70 rounded-full p-2 text-gray-700 hover:bg-opacity-100"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                          </svg>
+                        </button>
+                        <button 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleNextImage(doc._id);
+                          }}
+                          className="bg-white bg-opacity-70 rounded-full p-2 text-gray-700 hover:bg-opacity-100"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+              <div className="p-4">
+                <div className="mb-2">
+                  <span className="inline-block bg-green-100 text-green-600 text-xs px-3 py-1 rounded-full">
+                    {doc.category || "Donasi Jum'at Berkah"}
+                  </span>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-1">{doc.title}</h3>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </animated.div>
   );
 };

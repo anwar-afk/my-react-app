@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import ProgramForm from '../JS_programForm'; // Fixed import path
+import { Link } from 'react-router-dom';
+import ProgramForm from '../JS_programForm';
 
 const ProgramPage = () => {
   const [selectedProgram, setSelectedProgram] = useState(null);
@@ -35,7 +36,6 @@ const ProgramPage = () => {
     }
   };
   
-
   useEffect(() => {
     fetchCampaigns();
   }, []);
@@ -52,6 +52,7 @@ const ProgramPage = () => {
       });
       fetchCampaigns();
       showNotification('Program berhasil dibuat!', 'success');
+      setModalIsOpen(false);
       return response.data;
     } catch (error) {
       console.error('Error creating program:', error);
@@ -81,122 +82,147 @@ const ProgramPage = () => {
       throw error;
     }
   };
+
   const handleDeleteProgram = async (campaignId) => {
-    try {
-      const url = `${baseUrl}/api/campaigns/${campaignId}`;
-      console.log('Deleting program at:', url);
-  
-      await axios.delete(url, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-  
-      fetchCampaigns();
-      showNotification('Program berhasil dihapus!', 'success');
-    } catch (error) {
-      console.error('Error deleting program:', error);
-      showNotification('Gagal menghapus program.', 'error');
+    if (window.confirm('Apakah Anda yakin ingin menghapus program ini?')) {
+      try {
+        const url = `${baseUrl}/api/campaigns/${campaignId}`;
+        console.log('Deleting program at:', url);
+    
+        await axios.delete(url, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+    
+        fetchCampaigns();
+        showNotification('Program berhasil dihapus!', 'success');
+      } catch (error) {
+        console.error('Error deleting program:', error);
+        showNotification('Gagal menghapus program.', 'error');
+      }
     }
   };
-  
 
   const showNotification = (message, type) => {
     setNotification({ message, type });
-    setTimeout(() => setNotification(null), 3000);
+    setTimeout(() => {
+      setNotification(null);
+    }, 3000);
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric'
+    });
+  };
+
+  const handleSubmit = (formData) => {
+    if (selectedProgram) {
+      handleUpdateProgram(formData);
+    } else {
+      handleCreateProgram(formData);
+    }
   };
 
   return (
-    <div className="flex-1 p-8">
-      <h1 className="text-3xl font-bold mb-6">Program Admin</h1>
+    <div className="flex-1 p-8 bg-gray-100">
+      <h1 className="text-3xl font-bold text-gray-800 mb-6">Daftar Program</h1>
 
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold mb-4">Buat Program Baru</h2>
-        <ProgramForm onSubmit={handleCreateProgram} />
-      </div>
-
-      <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">Daftar Program</h2>
-        <table className="min-w-full bg-white border border-gray-300">
-          <thead>
-            <tr>
-              <th className="py-2 px-4 border-b">Title</th>
-              <th className="py-2 px-4 border-b">Images</th>
-              <th className="py-2 px-4 border-b">Date</th>
-              <th className="py-2 px-4 border-b">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-  {Array.isArray(campaigns) && campaigns.length > 0 ? (
-    campaigns.map((campaign) => (
-      <tr key={campaign.id}> {/* Ganti dari `_id` ke `id` karena sesuai dengan API */}
-        <td className="py-2 px-4 border-b">{campaign.title}</td>
-        <td className="py-2 px-4 border-b">
-          <div className="flex space-x-2">
-            {campaign.images && Array.isArray(campaign.images)
-              ? campaign.images.map((image, index) => (
-                  <img
-                    key={index}
-                    src={`${baseUrl}${image}`} // Gabungkan base URL dengan path gambar
-                    alt={`Campaign Image ${index + 1}`}
-                    className="w-16 h-16 object-cover rounded-md"
-                  />
-                ))
-              : 'No Images'}
-          </div>
-        </td>
-        <td className="py-2 px-4 border-b">
-          {new Date(campaign.startDate).toLocaleDateString()} - {new Date(campaign.endDate).toLocaleDateString()}
-        </td>
-        <td className="py-2 px-4 border-b">
-          <button
-            onClick={() => {
-              setSelectedProgram(campaign);
-              setModalIsOpen(true);
-            }}
-            className="bg-blue-500 text-white px-4 py-2 rounded-md mr-2"
-          >
-            Edit
-          </button>
-          <button
-            onClick={() => handleDeleteProgram(campaign.id)} 
-            className="bg-red-500 text-white px-4 py-2 rounded-md"
-          >
-            Delete
-          </button>
-        </td>
-      </tr>
-    ))
-  ) : (
-    <tr>
-      <td colSpan="4" className="text-center py-4">
-        No campaigns available
-      </td>
-    </tr>
-  )}
-</tbody>
-
-        </table>
-      </div>
-
-      {modalIsOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-4 rounded-lg shadow-md w-11/12 md:w-1/2 lg:w-1/3">
-            <h2 className="text-xl font-semibold mb-4">Edit Program</h2>
-            <ProgramForm
-              programData={selectedProgram}
-              onSubmit={handleUpdateProgram}
-              onCancel={() => setModalIsOpen(false)}
-            />
-          </div>
-        </div>
-      )}
-
+      {/* Notification */}
       {notification && (
         <div
-          className={`fixed bottom-4 right-4 p-4 rounded-md text-white ${
-            notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+          className={`mb-4 p-3 rounded-md ${
+            notification.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
           }`}
         >
           {notification.message}
+        </div>
+      )}
+
+      {/* Create Program Button */}
+      <button
+        onClick={() => {
+          setSelectedProgram(null);
+          setModalIsOpen(true);
+        }}
+        className="mb-6 px-4 py-2 bg-yellow-100 text-gray-800 rounded-md hover:bg-yellow-200 transition-colors"
+      >
+        + Buat Program Baru
+      </button>
+
+      {/* Program Table */}
+      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        {/* Table Header */}
+        <div className="grid grid-cols-4 bg-white p-4 border-b">
+          <div className="font-medium text-gray-700">Nama Program</div>
+          <div className="font-medium text-gray-700">Gambar</div>
+          <div className="font-medium text-gray-700">Waktu</div>
+          <div className="font-medium text-gray-700">Aksi</div>
+        </div>
+
+        {/* Table Body */}
+        {campaigns.length > 0 ? (
+          campaigns.map((campaign) => (
+            <div key={campaign._id} className="grid grid-cols-4 p-4 border-b hover:bg-gray-50">
+              <div className="text-gray-800">
+                {campaign.title}
+              </div>
+              <div>
+                {campaign.images && campaign.images.length > 0 && (
+                  <img
+                    src={`${baseUrl}${campaign.images[0]}`}
+                    alt={campaign.title}
+                    className="w-20 h-20 object-cover rounded"
+                  />
+                )}
+              </div>
+              <div className="text-gray-600">
+                {campaign.startDate && campaign.endDate 
+                  ? `${formatDate(campaign.startDate)}-${formatDate(campaign.endDate)}`
+                  : 'Tanggal tidak tersedia'}
+              </div>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => {
+                    setSelectedProgram(campaign);
+                    setModalIsOpen(true);
+                  }}
+                  className="px-3 py-1 bg-yellow-100 text-gray-800 rounded hover:bg-yellow-200"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDeleteProgram(campaign._id)}
+                  className="px-3 py-1 bg-white border border-gray-300 text-gray-800 rounded hover:bg-gray-100"
+                >
+                  Hapus
+                </button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="p-4 text-center text-gray-500">Tidak ada program yang tersedia.</div>
+        )}
+      </div>
+
+      {/* Modal for Create/Edit Program */}
+      {modalIsOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <h2 className="text-2xl font-bold mb-4">
+              {selectedProgram ? 'Edit Program' : 'Buat Program Baru'}
+            </h2>
+            <ProgramForm
+              programData={selectedProgram}
+              onSubmit={handleSubmit}
+              onCancel={() => {
+                setModalIsOpen(false);
+                setSelectedProgram(null);
+              }}
+            />
+          </div>
         </div>
       )}
     </div>
