@@ -14,7 +14,7 @@ const Album = () => {
     const fetchDocumentations = async () => {
       try {
         const response = await axios.get(
-          "https://api2donation.syakiramutiara.my.id/api/documentations"
+          "http://localhost:5000/api/documentations"
         );
         setDocumentations(response.data);
         setLoading(false);

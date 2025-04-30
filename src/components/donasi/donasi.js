@@ -4,7 +4,7 @@ import { getCampaigns } from '../../services/campaignService'; // Updated import
 import { useSpring, animated } from "@react-spring/web";
 import { useInView } from "react-intersection-observer";
 
-const baseUrl = "http://localhost:8000";
+const baseUrl = "http://localhost:5000";
 
 export const DonasiHeader = () => {
   const { ref, inView } = useInView({ triggerOnce: true });
@@ -119,7 +119,7 @@ const CampaignCard = ({ campaign }) => {
         className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 w-full block"
       >
         <img
-          src={campaign.images?.length > 0 ? `https://api2donation.syakiramutiara.my.id/${campaign.images[0]}` : "https://via.placeholder.com/300"}
+          src={campaign.images?.length > 0 ? `http://localhost:5000/${campaign.images[0]}` : "https://via.placeholder.com/300"}
           alt={campaign.title}
           className="w-full h-48 object-contain rounded-t-lg"
         />

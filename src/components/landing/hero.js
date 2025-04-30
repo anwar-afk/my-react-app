@@ -63,7 +63,7 @@ const DocumentationCarousel = () => {
     const fetchDocumentations = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/documentation"
+          "http://localhost:5000/api/documentations"
         );
         // Sort by date and get the latest 3
         const sortedDocs = response.data.sort((a, b) => 
@@ -90,8 +90,24 @@ const DocumentationCarousel = () => {
     setActiveIndex((prev) => (prev === documentations.length - 1 ? 0 : prev + 1));
   };
 
-  if (loading) return <div className="text-center py-10">Loading...</div>;
-  if (error) return <div className="text-center py-10 text-red-600">Error: {error}</div>;
+  if (loading) return (
+    <div className="text-center py-10">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+      <p>Memuat dokumentasi...</p>
+    </div>
+  );
+  if (error) return (
+    <div className="text-center py-10 text-red-600">
+      <p className="font-bold mb-2">Terjadi kesalahan:</p>
+      <p>{error}</p>
+      <button 
+        onClick={() => window.location.reload()} 
+        className="mt-4 px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200"
+      >
+        Coba lagi
+      </button>
+    </div>
+  );
 
   return (
     <FadeInComponent>
@@ -137,9 +153,13 @@ const DocumentationCarousel = () => {
                       }}
                     >
                       <img 
-                        src={`https://api2donation.syakiramutiara.my.id${doc.images[0]}`}
+                        src={`http://localhost:5000${doc.images[0]}`}
                         alt={doc.title}
                         className="w-full h-[300px] object-contain rounded-lg shadow-lg"
+                        onError={(e) => {
+                          console.error("Error loading image:", doc.images[0]);
+                          e.target.src = "/image/syakira-mutiara.png";
+                        }}
                       />
                     </div>
                   )
@@ -275,14 +295,14 @@ const ProgramKerja = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           {campaigns.map((campaign) => {
-            // ✅ Ensure correct image URL handling
+            // Ensure correct image URL handling
             const firstImage = campaign.images?.length > 0
-              ? `https://api2donation.syakiramutiara.my.id${campaign.images[0]}` // ✅ Remove extra `/`
-              : "https://via.placeholder.com/300"; // ✅ Fallback image
+              ? `http://localhost:5000${campaign.images[0]}`
+              : "/image/syakira-mutiara.png"; // Menggunakan logo sebagai fallback
 
             return (
               <Link
-                to={`/donation/${campaign.id}`} // ✅ Correct ID usage
+                to={`/donation/${campaign.id}`}
                 key={campaign.id}
                 className="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
               >
@@ -290,7 +310,10 @@ const ProgramKerja = () => {
                   src={firstImage}
                   alt={campaign.title}
                   className="w-full h-64 object-contain rounded-t-lg"
-                  onError={(e) => (e.target.src = "https://via.placeholder.com/300")}
+                  onError={(e) => {
+                    console.error("Error loading image:", firstImage);
+                    e.target.src = "/image/syakira-mutiara.png";
+                  }}
                 />
                 <div className="p-6">
                   <h3 className="text-lg font-semibold text-gray-800 mb-4">{campaign.title}</h3>

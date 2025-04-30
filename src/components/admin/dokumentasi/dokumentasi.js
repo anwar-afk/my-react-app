@@ -13,7 +13,7 @@ const DokumentasiPage = () => {
     const fetchDocumentations = async () => {
       try {
         const response = await axios.get(
-          "https://api2donation.syakiramutiara.my.id/api/documentations"
+          "http://localhost:5000/api/documentations"
         );
         setDocumentations(response.data);
         setLoading(false);
@@ -42,7 +42,7 @@ const DokumentasiPage = () => {
       try {
         const token = localStorage.getItem("token");
         await axios.delete(
-          `https://api2donation.syakiramutiara.my.id/api/documentations/${documentationId}`,
+          `http://localhost:5000/api/documentations/${documentationId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -105,7 +105,7 @@ const DokumentasiPage = () => {
               {doc.images && doc.images.length > 0 && (
                 <div className="h-48 overflow-hidden">
                   <img
-                    src={`https://api2donation.syakiramutiara.my.id${doc.images[0]}`}
+                    src={`http://localhost:5000${doc.images[0]}`}
                     alt={doc.title}
                     className="w-full h-full object-cover"
                   />
