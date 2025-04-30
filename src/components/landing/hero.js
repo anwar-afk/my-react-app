@@ -63,7 +63,7 @@ const DocumentationCarousel = () => {
     const fetchDocumentations = async () => {
       try {
         const response = await axios.get(
-          "https://api2donation.syakiramutiara.my.id/api/documentations"
+          "http://localhost:5000/api/documentation"
         );
         // Sort by date and get the latest 3
         const sortedDocs = response.data.sort((a, b) => 

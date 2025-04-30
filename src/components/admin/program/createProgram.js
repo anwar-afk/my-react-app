@@ -59,12 +59,12 @@ const CreateProgram = () => {
     try {
       // Kirim data ke backend
       const response = await axios.post(
-        'https://api2donation.syakiramutiara.my.id/api/campaigns', // Pastikan URL ini benar
+        'http://localhost:5000/api/campaigns',
         data,
         {
           headers: {
-            'Content-Type': 'multipart/form-data', // Penting untuk mengirim file
-            Authorization: `Bearer ${localStorage.getItem('token')}`, // Jika memerlukan token
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         }
       );

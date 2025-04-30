@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'https://api2donation.syakiramutiara.my.id/api/auth';
+const API_URL = 'http://localhost:5000/api/auth';
 
 export const register = async (userData) => {
   try {

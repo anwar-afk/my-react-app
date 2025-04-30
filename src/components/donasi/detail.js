@@ -11,7 +11,7 @@ import 'swiper/css/pagination';
 import { Navigation, Pagination } from 'swiper/modules';
 
 // Base API URL
-const baseUrl = 'https://api2donation.syakiramutiara.my.id';
+const baseUrl = 'http://localhost:5000';
 
 const DonationDetailPage = () => {
   const { id } = useParams();
