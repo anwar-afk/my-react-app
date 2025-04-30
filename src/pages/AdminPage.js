@@ -6,6 +6,8 @@ import Dashboard from '../components/admin/dashboard/dashboard';
 import ProgramPage from '../components/admin/program/program';
 import DokumentasiPage from '../components/admin/dokumentasi/dokumentasi';
 import BuatDokumentasiPage from '../components/admin/dokumentasi/buatDokumentasi';
+import KeuanganPage from '../components/admin/keuangan/KeuanganPage';
+import CampaignStatisticDetail from '../components/admin/keuangan/CampaignStatisticDetail';
 
 const AdminPage = () => {
   const { user } = useContext(AuthContext);
@@ -42,6 +44,8 @@ const AdminPage = () => {
             <Route path="program" element={<ProgramPage />} />
             <Route path="dokumentasi" element={<DokumentasiPage />} />
             <Route path="dokumentasi/buat" element={<BuatDokumentasiPage />} />
+            <Route path="keuangan" element={<KeuanganPage />} />
+            <Route path="keuangan/detail/:id" element={<CampaignStatisticDetail />} />
             <Route index element={<Dashboard />} />
           </Routes>
         </main>

@@ -23,16 +23,15 @@ const ProgramPage = () => {
   
       console.log('Campaigns response:', response.data);
       
-      // Pastikan mengambil array `campaigns` dari response API
       if (response.data && Array.isArray(response.data.campaigns)) {
         setCampaigns(response.data.campaigns);
       } else {
         console.error('Unexpected response format:', response.data);
-        setCampaigns([]); // Set ke array kosong untuk menghindari error
+        setCampaigns([]);
       }
     } catch (error) {
       console.error('Error fetching campaigns:', error);
-      setCampaigns([]); // Set ke array kosong jika terjadi error
+      setCampaigns([]);
     }
   };
   
@@ -63,7 +62,7 @@ const ProgramPage = () => {
 
   const handleUpdateProgram = async (data) => {
     try {
-      const url = `${baseUrl}/api/campaigns/${selectedProgram._id}`;
+      const url = `${baseUrl}/api/campaigns/${selectedProgram.id}`;
       console.log('Updating program at:', url);
       const response = await axios.put(url, data, {
         headers: {
@@ -113,9 +112,18 @@ const ProgramPage = () => {
     const date = new Date(dateString);
     return date.toLocaleDateString('id-ID', {
       day: 'numeric',
-      month: 'numeric',
+      month: 'long',
       year: 'numeric'
     });
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(amount);
   };
 
   const handleSubmit = (formData) => {
@@ -130,7 +138,6 @@ const ProgramPage = () => {
     <div className="flex-1 p-8 bg-gray-100">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Daftar Program</h1>
 
-      {/* Notification */}
       {notification && (
         <div
           className={`mb-4 p-3 rounded-md ${
@@ -141,7 +148,6 @@ const ProgramPage = () => {
         </div>
       )}
 
-      {/* Create Program Button */}
       <button
         onClick={() => {
           setSelectedProgram(null);
@@ -152,50 +158,53 @@ const ProgramPage = () => {
         + Buat Program Baru
       </button>
 
-      {/* Program Table */}
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-        {/* Table Header */}
-        <div className="grid grid-cols-4 bg-white p-4 border-b">
+        <div className="grid grid-cols-6 bg-gray-50 p-4 border-b">
           <div className="font-medium text-gray-700">Nama Program</div>
           <div className="font-medium text-gray-700">Gambar</div>
-          <div className="font-medium text-gray-700">Waktu</div>
+          <div className="font-medium text-gray-700">Kategori</div>
+          <div className="font-medium text-gray-700">Target</div>
+          <div className="font-medium text-gray-700">Periode</div>
           <div className="font-medium text-gray-700">Aksi</div>
         </div>
 
-        {/* Table Body */}
         {campaigns.length > 0 ? (
           campaigns.map((campaign) => (
-            <div key={campaign._id} className="grid grid-cols-4 p-4 border-b hover:bg-gray-50">
-              <div className="text-gray-800">
+            <div key={campaign.id} className="grid grid-cols-6 p-4 border-b hover:bg-gray-50">
+              <div className="text-gray-800 flex items-center">
                 {campaign.title}
               </div>
-              <div>
+              <div className="flex items-center">
                 {campaign.images && campaign.images.length > 0 && (
                   <img
                     src={`${baseUrl}${campaign.images[0]}`}
                     alt={campaign.title}
-                    className="w-20 h-20 object-cover rounded"
+                    className="w-16 h-16 object-cover rounded"
                   />
                 )}
               </div>
-              <div className="text-gray-600">
-                {campaign.startDate && campaign.endDate 
-                  ? `${formatDate(campaign.startDate)}-${formatDate(campaign.endDate)}`
-                  : 'Tanggal tidak tersedia'}
+              <div className="text-gray-600 flex items-center">
+                {campaign.category || '-'}
               </div>
-              <div className="flex space-x-2">
+              <div className="text-gray-600 flex items-center">
+                {formatCurrency(campaign.target)}
+              </div>
+              <div className="text-gray-600 flex items-center">
+                {formatDate(campaign.startDate)} - {formatDate(campaign.endDate)}
+              </div>
+              <div className="flex space-x-2 items-center">
                 <button
                   onClick={() => {
                     setSelectedProgram(campaign);
                     setModalIsOpen(true);
                   }}
-                  className="min-w-[100px] px-4 py-2 bg-yellow-100 text-gray-800 rounded-md hover:bg-yellow-200 transition-colors text-sm"
+                  className="px-3 py-1 bg-yellow-100 text-gray-800 rounded hover:bg-yellow-200 transition-colors text-sm"
                 >
                   Edit
                 </button>
                 <button
-                  onClick={() => handleDeleteProgram(campaign._id)}
-                  className="min-w-[100px] px-4 py-2 bg-white border border-gray-300 text-gray-800 rounded-md hover:bg-gray-100 transition-colors text-sm"
+                  onClick={() => handleDeleteProgram(campaign.id)}
+                  className="px-3 py-1 bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors text-sm"
                 >
                   Hapus
                 </button>
@@ -203,27 +212,22 @@ const ProgramPage = () => {
             </div>
           ))
         ) : (
-          <div className="p-4 text-center text-gray-500">Tidak ada program yang tersedia.</div>
+          <div className="p-4 text-center text-gray-500">
+            Belum ada program yang dibuat
+          </div>
         )}
       </div>
 
-      {/* Modal for Create/Edit Program */}
       {modalIsOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <h2 className="text-2xl font-bold mb-4">
-              {selectedProgram ? 'Edit Program' : 'Buat Program Baru'}
-            </h2>
-            <ProgramForm
-              programData={selectedProgram}
-              onSubmit={handleSubmit}
-              onCancel={() => {
-                setModalIsOpen(false);
-                setSelectedProgram(null);
-              }}
-            />
-          </div>
-        </div>
+        <ProgramForm
+          isOpen={modalIsOpen}
+          onClose={() => {
+            setModalIsOpen(false);
+            setSelectedProgram(null);
+          }}
+          onSubmit={handleSubmit}
+          initialData={selectedProgram}
+        />
       )}
     </div>
   );
