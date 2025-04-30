@@ -189,13 +189,13 @@ const ProgramPage = () => {
                     setSelectedProgram(campaign);
                     setModalIsOpen(true);
                   }}
-                  className="px-3 py-1 bg-yellow-100 text-gray-800 rounded hover:bg-yellow-200"
+                  className="min-w-[100px] px-4 py-2 bg-yellow-100 text-gray-800 rounded-md hover:bg-yellow-200 transition-colors text-sm"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => handleDeleteProgram(campaign._id)}
-                  className="px-3 py-1 bg-white border border-gray-300 text-gray-800 rounded hover:bg-gray-100"
+                  className="min-w-[100px] px-4 py-2 bg-white border border-gray-300 text-gray-800 rounded-md hover:bg-gray-100 transition-colors text-sm"
                 >
                   Hapus
                 </button>

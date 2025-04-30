@@ -20,7 +20,7 @@ const Sidebar = () => {
   return (
     <div className="bg-green-200 text-gray-800 w-64 min-h-screen flex flex-col">
       <div className="p-4 flex items-center space-x-2">
-        <img src="/image/logo.png" alt="Logo" className="w-10 h-10" />
+        <img src="/android-chrome-512x512.png" alt="Logo" className="w-10 h-10" />
         <div>
           <h1 className="text-lg font-bold">Yayasan</h1>
           <p className="text-sm">Syakira Mutiara</p>
