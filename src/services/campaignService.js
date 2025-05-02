@@ -17,7 +17,6 @@ export const getCampaignStatistics = async () => {
   }
 };
 
-const baseUrl = 'http://localhost:5000/api';
 export const getCampaigns = async () => {
   try {
     const token = localStorage.getItem('token');
@@ -26,8 +25,22 @@ export const getCampaigns = async () => {
         Authorization: `Bearer ${token}`
       }
     });
+
+    // Ensure response has the expected format
+    if (response.data && Array.isArray(response.data)) {
+      return {
+        success: true,
+        campaigns: response.data.map(campaign => ({
+          ...campaign,
+          latitude: campaign.latitude || -6.200000, // Default to Jakarta coordinates if not set
+          longitude: campaign.longitude || 106.816666
+        }))
+      };
+    }
+    
     return response.data;
   } catch (error) {
+    console.error('Error fetching campaigns:', error);
     throw error.response;
   }
 };
