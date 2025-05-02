@@ -85,7 +85,7 @@ const Dashboard = () => {
         <p className="text-sm text-gray-500">
           Terakhir diperbarui: {formatDate(statistics.lastUpdated)}
         </p>
-      </div>
+        </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => (
@@ -99,7 +99,7 @@ const Dashboard = () => {
               <p className="text-sm text-gray-600 mb-1">{stat.title}</p>
               <p className="text-2xl font-bold text-gray-800">{stat.value}</p>
             </div>
-          </div>
+        </div>
         ))}
       </div>
     </div>

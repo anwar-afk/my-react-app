@@ -134,6 +134,11 @@ const ProgramPage = () => {
     }
   };
 
+  const handleCancel = () => {
+    setModalIsOpen(false);
+    setSelectedProgram(null);
+  };
+
   return (
     <div className="flex-1 p-8 bg-gray-100">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Daftar Program</h1>
@@ -227,6 +232,7 @@ const ProgramPage = () => {
           }}
           onSubmit={handleSubmit}
           initialData={selectedProgram}
+          onCancel={handleCancel}
         />
       )}
     </div>
