@@ -101,6 +101,26 @@ const ProgramPage = () => {
     }
   };
 
+  const handleEditProgram = async (campaign) => {
+    try {
+      const url = `${baseUrl}/api/campaigns/${campaign.id}`;
+      const response = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      if (response.data) {
+        setSelectedProgram({
+          ...campaign,
+          ...response.data
+        });
+        setModalIsOpen(true);
+      }
+    } catch (error) {
+      console.error('Error fetching program details:', error);
+      showNotification('Gagal mengambil detail program.', 'error');
+    }
+  };
+
   const showNotification = (message, type) => {
     setNotification({ message, type });
     setTimeout(() => {
@@ -199,10 +219,7 @@ const ProgramPage = () => {
               </div>
               <div className="flex space-x-2 items-center">
                 <button
-                  onClick={() => {
-                    setSelectedProgram(campaign);
-                    setModalIsOpen(true);
-                  }}
+                  onClick={() => handleEditProgram(campaign)}
                   className="px-3 py-1 bg-yellow-100 text-gray-800 rounded hover:bg-yellow-200 transition-colors text-sm"
                 >
                   Edit
@@ -225,13 +242,8 @@ const ProgramPage = () => {
 
       {modalIsOpen && (
         <ProgramForm
-          isOpen={modalIsOpen}
-          onClose={() => {
-            setModalIsOpen(false);
-            setSelectedProgram(null);
-          }}
+          programData={selectedProgram}
           onSubmit={handleSubmit}
-          initialData={selectedProgram}
           onCancel={handleCancel}
         />
       )}
