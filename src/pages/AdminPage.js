@@ -22,7 +22,7 @@ const AdminPage = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <header className="bg-white shadow-sm p-4 flex justify-end items-center">
+        <header className="bg-green-300 shadow-sm p-4 flex justify-end items-center pb-6">
           <div className="flex items-center">
             <span className="mr-3 text-gray-700">Admin, {adminName}</span>
             <div className="w-10 h-10 rounded-full overflow-hidden">

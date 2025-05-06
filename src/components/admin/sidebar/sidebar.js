@@ -18,23 +18,23 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="bg-green-100 text-gray-800 w-64 min-h-screen flex flex-col">
+    <div className="bg-green-200 text-gray-800 w-64 min-h-screen flex flex-col">
       <div className="p-4 flex items-center space-x-2">
-        <img src="/image/logo.png" alt="Logo" className="w-10 h-10" />
+        <img src="/android-chrome-512x512.png" alt="Logo" className="w-10 h-10" />
         <div>
           <h1 className="text-lg font-bold">Yayasan</h1>
           <p className="text-sm">Syakira Mutiara</p>
         </div>
       </div>
       
-      <ul className="flex-1 p-4">
+      <ul className="bg-white flex-1 p-4">
         <li className="mb-2">
           <Link 
             to="/admin/dashboard" 
-            className={`flex items-center p-3 rounded-lg ${
+            className={`flex items-center p-3 rounded-lg transition-all duration-200 ${
               isActive('/admin/dashboard') 
-                ? 'bg-white text-gray-800' 
-                : 'text-gray-700 hover:bg-white/50'
+                ? 'bg-gray-100 text-gray-800 shadow-md' 
+                : 'text-gray-700 hover:bg-gray-50'
             }`}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor">
@@ -46,10 +46,10 @@ const Sidebar = () => {
         <li className="mb-2">
           <Link 
             to="/admin/program" 
-            className={`flex items-center p-3 rounded-lg ${
+            className={`flex items-center p-3 rounded-lg transition-all duration-200 ${
               isActive('/admin/program') 
-                ? 'bg-white text-gray-800' 
-                : 'text-gray-700 hover:bg-white/50'
+                ? 'bg-gray-100 text-gray-800 shadow-md' 
+                : 'text-gray-700 hover:bg-gray-50'
             }`}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor">
@@ -61,10 +61,10 @@ const Sidebar = () => {
         <li className="mb-2">
           <Link 
             to="/admin/dokumentasi" 
-            className={`flex items-center p-3 rounded-lg ${
+            className={`flex items-center p-3 rounded-lg transition-all duration-200 ${
               isActive('/admin/dokumentasi') 
-                ? 'bg-white text-gray-800' 
-                : 'text-gray-700 hover:bg-white/50'
+                ? 'bg-gray-100 text-gray-800 shadow-md' 
+                : 'text-gray-700 hover:bg-gray-50'
             }`}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor">
@@ -76,10 +76,10 @@ const Sidebar = () => {
         <li className="mb-2">
           <Link 
             to="/admin/keuangan" 
-            className={`flex items-center p-3 rounded-lg ${
+            className={`flex items-center p-3 rounded-lg transition-all duration-200 ${
               isActive('/admin/keuangan') 
-                ? 'bg-white text-gray-800' 
-                : 'text-gray-700 hover:bg-white/50'
+                ? 'bg-gray-100 text-gray-800 shadow-md' 
+                : 'text-gray-700 hover:bg-gray-50'
             }`}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor">
@@ -90,7 +90,7 @@ const Sidebar = () => {
         </li>
       </ul>
       
-      <div className="p-4">
+      <div className="bg-white p-4">
         <button
           onClick={handleLogout}
           className="w-full py-2 px-4 bg-yellow-100 text-gray-800 rounded-lg hover:bg-yellow-200 transition-colors"

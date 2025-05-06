@@ -21,9 +21,14 @@ const Navbar = () => {
     <nav className="flex flex-wrap items-center justify-between px-6 lg:px-36 py-4 bg-white border-b border-gray-200 drop-shadow-lg relative z-50">
       {/* Logo Section */}
       <div className="flex items-center space-x-2">
+        <img
+          src="android-chrome-192x192.png"
+          alt="Logo"
+          className="w-10 h-10 object-contain"
+        />
         <div>
-          <h1 className="text-lg font-bold text-gray-800">Yayasan</h1>
-          <p className="text-sm text-gray-600">Syakira Mutiara</p>
+          <h1 className="text-lg font-bold text-gray-800 m-0 leading-tight">Yayasan</h1>
+          <p className="text-sm text-gray-600 m-0 leading-tight">Syakira Mutiara</p>
         </div>
       </div>  
 
