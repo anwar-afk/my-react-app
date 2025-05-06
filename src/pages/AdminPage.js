@@ -1,20 +1,21 @@
-import React, { useContext } from 'react';
-import { Routes, Route } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
-import Sidebar from '../components/admin/sidebar/sidebar';
-import Dashboard from '../components/admin/dashboard/dashboard';
-import ProgramPage from '../components/admin/program/program';
-import DokumentasiPage from '../components/admin/dokumentasi/dokumentasi';
-import BuatDokumentasiPage from '../components/admin/dokumentasi/buatDokumentasi';
-import KeuanganPage from '../components/admin/keuangan/KeuanganPage';
-import CampaignStatisticDetail from '../components/admin/keuangan/CampaignStatisticDetail';
+import React, { useContext } from "react";
+import { Routes, Route } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
+import Sidebar from "../components/admin/sidebar/sidebar";
+import Dashboard from "../components/admin/dashboard/dashboard";
+import ProgramPage from "../components/admin/program/program";
+import DokumentasiPage from "../components/admin/dokumentasi/dokumentasi";
+import BuatDokumentasiPage from "../components/admin/dokumentasi/buatDokumentasi";
+import KeuanganPage from "../components/admin/keuangan/KeuanganPage";
+import CampaignStatisticDetail from "../components/admin/keuangan/CampaignStatisticDetail";
+import LaporanKeuangan from "../components/admin/laporanKeuangan/LaporanKeuangan"; 
 
 const AdminPage = () => {
   const { user } = useContext(AuthContext);
-  
+
   // Default profile image if user doesn't have one
-  const profileImage = user?.profileImage || '/image/default-avatar.png';
-  const adminName = user?.name || 'Admin';
+  const profileImage = user?.profileImage || "/image/default-avatar.png";
+  const adminName = user?.name || "Admin";
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -28,9 +29,9 @@ const AdminPage = () => {
           <div className="flex items-center">
             <span className="mr-3 text-gray-700">Admin, {adminName}</span>
             <div className="w-10 h-10 rounded-full overflow-hidden">
-              <img 
-                src={profileImage} 
-                alt="Profile" 
+              <img
+                src={profileImage}
+                alt="Profile"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -45,7 +46,11 @@ const AdminPage = () => {
             <Route path="dokumentasi" element={<DokumentasiPage />} />
             <Route path="dokumentasi/buat" element={<BuatDokumentasiPage />} />
             <Route path="keuangan" element={<KeuanganPage />} />
-            <Route path="keuangan/detail/:id" element={<CampaignStatisticDetail />} />
+            <Route
+              path="keuangan/detail/:id"
+              element={<CampaignStatisticDetail />}
+            />
+            <Route path="laporankeuangan" element={<LaporanKeuangan />} />
             <Route index element={<Dashboard />} />
           </Routes>
         </main>
