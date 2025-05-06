@@ -45,15 +45,26 @@ export const DonasiContent = () => {
     const fetchCampaigns = async () => {
       try {
         const response = await getCampaigns();
-        console.log("Fetched data:", response); // ✅ Debugging: Show API response
+        console.log("Fetched data:", response);
 
-        // Ensure campaigns exist and are an array
+        // Add more detailed debugging
         if (response && response.campaigns && Array.isArray(response.campaigns)) {
-          // Don't limit to 3 campaigns for the donation page
-          setCampaigns(response.campaigns);
+          console.log("First campaign:", response.campaigns[0]);
+          console.log("First campaign image paths:", response.campaigns[0]?.images);
+          console.log("Campaign ID type:", typeof response.campaigns[0]?.id);
+          console.log("Campaign _id type:", typeof response.campaigns[0]?._id);
+          
+          // Use the correct ID field based on your API response
+          const processedCampaigns = response.campaigns.map(campaign => ({
+            ...campaign,
+            // Ensure we have an id property (use _id as fallback)
+            id: campaign.id || campaign._id
+          }));
+          
+          setCampaigns(processedCampaigns);
         } else {
           console.error("Unexpected response format:", response);
-          setCampaigns([]); // Avoid crashes by setting an empty array
+          setCampaigns([]);
         }
       } catch (err) {
         console.error("Error fetching campaigns:", err);
@@ -112,24 +123,65 @@ const CampaignCard = ({ campaign }) => {
     transform: inView ? "translateY(0px)" : "translateY(50px)",
   });
 
+  // Improved image URL construction with better error handling
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return "https://via.placeholder.com/300";
+    
+    // Log the image path for debugging
+    console.log("Image path:", imagePath);
+    
+    // Handle different image path formats
+    if (imagePath.startsWith('http')) {
+      return imagePath;
+    }
+    
+    // Remove any leading slashes
+    const cleanPath = imagePath.startsWith('/') ? imagePath.substring(1) : imagePath;
+    
+    // Use the base domain without the /api suffix for images
+    return `https://api2donation.syakiramutiara.my.id/${cleanPath}`;
+  };
+
+  // Add debugging for the campaign object
+  console.log("Rendering campaign:", campaign);
+  
+  // Ensure we have a valid campaign object
+  if (!campaign) {
+    return <div>Invalid campaign data</div>;
+  }
+
   return (
     <animated.div ref={ref} style={cardAnimation} className="w-full">
       <Link
-        to={`/donation/${campaign.id}`} // ✅ Use `id` instead of `_id`
+        to={`/donation/${campaign.id || campaign._id}`}
         className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 w-full block"
       >
-        <img
-          src={campaign.images?.length > 0 ? `https://api2donation.syakiramutiara.my.id/${campaign.images[0]}` : "https://via.placeholder.com/300"}
-          alt={campaign.title}
-          className="w-full h-48 object-contain rounded-t-lg"
-        />
+        <div className="h-48 relative">
+          {campaign.images && campaign.images.length > 0 ? (
+            <img
+              src={getImageUrl(campaign.images[0])}
+              alt={campaign.title}
+              className="w-full h-full object-cover rounded-t-lg"
+              onError={(e) => {
+                console.error("Image failed to load:", e.target.src);
+                e.target.src = "https://via.placeholder.com/300";
+              }}
+            />
+          ) : (
+            <img
+              src="https://via.placeholder.com/300"
+              alt="No image available"
+              className="w-full h-full object-cover rounded-t-lg"
+            />
+          )}
+        </div>
         <div className="p-4">
           <span className="text-sm bg-green-100 text-green-600 font-medium px-3 py-1 rounded-full inline-block mb-3">
-            {campaign.category}
+            {campaign.category || "Uncategorized"}
           </span>
-          <h3 className="text-lg font-bold text-gray-800 mb-2">{campaign.title}</h3>
+          <h3 className="text-lg font-bold text-gray-800 mb-2">{campaign.title || "Untitled Campaign"}</h3>
           <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-            {campaign.detail || "Deskripsi tidak tersedia."} {/* ✅ Fix: Use `detail` instead of `description` */}
+            {campaign.detail || "Deskripsi tidak tersedia."}
           </p>
           <div className="text-green-500 font-medium hover:underline flex items-center">
             Lihat Selengkapnya <span className="ml-1">→</span>
