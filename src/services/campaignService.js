@@ -21,26 +21,30 @@ export const getCampaigns = async () => {
   try {
     const token = localStorage.getItem('token');
     const response = await axios.get(`${API_URL}/campaigns`, {
-      headers: {
+      headers: token ? {
         Authorization: `Bearer ${token}`
-      }
+      } : {}
     });
 
-    // Ensure response has the expected format
-    if (response.data && Array.isArray(response.data)) {
-      return {
-        success: true,
-        campaigns: response.data.map(campaign => ({
-          ...campaign,
-          latitude: campaign.latitude || -6.200000, // Default to Jakarta coordinates if not set
-          longitude: campaign.longitude || 106.816666
-        }))
-      };
-    }
+    // Normalize response data
+    const campaignsData = Array.isArray(response.data) ? response.data : 
+                         response.data.campaigns ? response.data.campaigns : [];
     
-    return response.data;
+    return {
+      success: true,
+      campaigns: campaignsData.map(campaign => ({
+        ...campaign,
+        id: campaign._id || campaign.id, // Handle both MongoDB _id and regular id
+        latitude: campaign.latitude || -6.200000,
+        longitude: campaign.longitude || 106.816666
+      }))
+    };
   } catch (error) {
     console.error('Error fetching campaigns:', error);
-    throw error.response;
+    return {
+      success: false,
+      campaigns: [],
+      error: error.message
+    };
   }
 };

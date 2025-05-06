@@ -45,19 +45,20 @@ export const DonasiContent = () => {
     const fetchCampaigns = async () => {
       try {
         const response = await getCampaigns();
-        console.log("Fetched data:", response); // ✅ Debugging: Show API response
+        console.log("Raw response:", response);
 
-        // Ensure campaigns exist and are an array
-        if (response && response.campaigns && Array.isArray(response.campaigns)) {
-          // Don't limit to 3 campaigns for the donation page
+        if (response.success && Array.isArray(response.campaigns)) {
+          console.log("Valid campaigns:", response.campaigns);
           setCampaigns(response.campaigns);
         } else {
-          console.error("Unexpected response format:", response);
-          setCampaigns([]); // Avoid crashes by setting an empty array
+          console.error("Invalid response format:", response);
+          setError("Format data tidak valid");
+          setCampaigns([]);
         }
       } catch (err) {
         console.error("Error fetching campaigns:", err);
         setError(err.message || "Terjadi kesalahan saat mengambil data campaign");
+        setCampaigns([]);
       } finally {
         setLoading(false);
       }
@@ -66,13 +67,27 @@ export const DonasiContent = () => {
     fetchCampaigns();
   }, []);
 
-  const filteredCampaigns = campaigns.filter((campaign) =>
-    (selectedCategory === "all" || campaign.category === selectedCategory) &&
-    new Date(campaign.endDate) > new Date()
-  );
+  const filteredCampaigns = React.useMemo(() => {
+    if (!Array.isArray(campaigns)) return [];
+    
+    return campaigns.filter((campaign) => {
+      if (!campaign) return false;
+      
+      // Normalize category name by replacing underscores with spaces
+      const normalizedCategory = campaign.category?.replace(/_/g, ' ');
+      const isValidCategory = selectedCategory === "all" || normalizedCategory === selectedCategory;
+      
+      // Check if campaign is still active
+      const endDate = new Date(campaign.endDate);
+      const isActive = !isNaN(endDate.getTime()) && endDate > new Date();
+      
+      return isValidCategory && isActive;
+    });
+  }, [campaigns, selectedCategory]);
 
   if (loading) return <div className="text-center py-10">Loading...</div>;
   if (error) return <div className="text-center py-10 text-red-600">Error: {error}</div>;
+  if (!campaigns.length) return <div className="text-center py-10">Tidak ada campaign yang tersedia</div>;
 
   return (
     <div id="donasi-content" className="px-6 lg:px-40 py-10">
@@ -81,22 +96,38 @@ export const DonasiContent = () => {
       </h1>
       <div className="flex justify-between items-center mb-10">
         <h2 className="text-2xl lg:text-3xl font-bold text-gray-800">Donasi</h2>
-        <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="px-4 py-2 border border-gray-300 rounded-lg">
+        <select 
+          value={selectedCategory} 
+          onChange={(e) => setSelectedCategory(e.target.value)} 
+          className="px-4 py-2 border border-gray-300 rounded-lg"
+        >
           <option value="all">Semua Kategori</option>
           {categories.map((category) => (
             <option key={category} value={category}>{category}</option>
           ))}
         </select>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-      {filteredCampaigns.slice(0, showAll ? filteredCampaigns.length : 4).map((campaign) => (
-        // ✅ Use `id` instead of `_id`
-        <CampaignCard key={campaign.id} campaign={campaign} />
-      ))}
-    </div>
+      
+      {filteredCampaigns.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredCampaigns
+            .slice(0, showAll ? filteredCampaigns.length : 4)
+            .map((campaign) => (
+              <CampaignCard key={campaign.id || campaign._id} campaign={campaign} />
+            ))}
+        </div>
+      ) : (
+        <div className="text-center py-10">
+          Tidak ada campaign dalam kategori ini
+        </div>
+      )}
+
       {filteredCampaigns.length > 4 && (
         <div className="flex justify-center mt-10">
-          <button onClick={() => setShowAll(!showAll)} className="px-4 py-2 bg-green-500 text-white rounded-lg font-semibold shadow-md hover:bg-green-600 transition">
+          <button 
+            onClick={() => setShowAll(!showAll)} 
+            className="px-4 py-2 bg-green-500 text-white rounded-lg font-semibold shadow-md hover:bg-green-600 transition"
+          >
             {showAll ? "Tampilkan Lebih Sedikit" : "Lihat Lebih Banyak"}
           </button>
         </div>

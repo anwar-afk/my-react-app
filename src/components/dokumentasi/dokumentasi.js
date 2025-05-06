@@ -128,7 +128,7 @@ const Album = () => {
                 {doc.images && doc.images.length > 0 && (
                   <div className="relative">
                     <img
-                      src={`https://api2donation.syakiramutiara.my.id${doc.images[currentImageIndex]}`}
+                      src={`http://localhost:5000${doc.images[currentImageIndex]}`}
                       alt={doc.title}
                       className="w-full h-64 object-contain"
                     />
