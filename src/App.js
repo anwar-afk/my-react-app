@@ -14,6 +14,7 @@ import AdminPage from "./pages/AdminPage"; // Import halaman admin
 import { AuthContext } from "./context/AuthContext";
 import { useScrollReveal } from "./hooks/useScrollReveal";
 import RoleMiddleware from "./middleware/RoleMiddleware"; // Import RoleMiddleware
+import LaporanKeuangan from "./components/admin/laporanKeuangan/LaporanKeuangan"; // Import halaman baru
 
 // Komponen Home terpisah
 const Home = () => {
@@ -28,7 +29,8 @@ const Home = () => {
 
 function App() {
   const location = useLocation();
-  const isLoginOrRegister = location.pathname === "/login" || location.pathname === "/register";
+  const isLoginOrRegister =
+    location.pathname === "/login" || location.pathname === "/register";
   const isAdmin = location.pathname.startsWith("/admin"); // Cek apakah route adalah /admin
   const { updateLastInteraction } = useContext(AuthContext);
 
@@ -70,6 +72,7 @@ function App() {
             </RoleMiddleware>
           }
         />
+        <Route path="/laporan-keuangan" element={<LaporanKeuangan />} />
       </Routes>
 
       {/* Tampilkan Footer hanya jika bukan halaman login, register, atau admin */}
