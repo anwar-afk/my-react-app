@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { useSpring, animated } from "@react-spring/web";
 
 const DokumentasiPage = () => {
   const [dokumentasi, setDokumentasi] = useState([]);
@@ -59,13 +60,19 @@ const DokumentasiPage = () => {
     });
   };
 
+  const fadeIn = useSpring({
+    from: { opacity: 0, transform: "translateY(20px)" },
+    to: { opacity: 1, transform: "translateY(0)" },
+    config: { duration: 1000 },
+  });
+
   if (loading) return <div className="p-6">Memuat data...</div>;
   if (error) return <div className="p-6 text-red-500">{error}</div>;
 
   return (
-    <div className="flex-1 p-8 bg-gray-100">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">
+    <animated.div style={fadeIn} className="flex-1 p-8 bg-gray-100">
+      <div className="flex flex-col items-start mb-6">
+        <h1 className="text-3xl font-bold text-gray-800 mb-4">
           Dokumentasi Kegiatan
         </h1>
         <Link
@@ -151,7 +158,7 @@ const DokumentasiPage = () => {
           </div>
         )}
       </div>
-    </div>
+    </animated.div>
   );
 };
 

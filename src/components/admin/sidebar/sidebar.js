@@ -132,14 +132,10 @@ const Sidebar = () => {
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5 mr-3"
-              viewBox="0 0 20 20"
+              viewBox="0 0 24 24"
               fill="currentColor"
             >
-              <path
-                fillRule="evenodd"
-                d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
-                clipRule="evenodd"
-              />
+              <path d="M6 2a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6H6zm7 1.5L18.5 9H13V3.5zM6 4h6v5h5v11H6V4z" />
             </svg>
             Laporan Keuangan
           </Link>
