@@ -21,7 +21,7 @@ const LaporanKeuangan = () => {
   const visibleReports = reports; // Display all reports without slicing
 
   return (
-    <animated.div style={fadeIn} className="container mx-auto px-8 py-8">
+    <animated.div style={fadeIn} className="container mx-auto p-8">
       <h1 className="text-2xl font-bold mb-2">Keuangan Tahunan</h1>
 
       <div className="mb-12">
