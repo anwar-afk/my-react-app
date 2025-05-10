@@ -63,7 +63,7 @@ const DokumentasiPage = () => {
   const fadeIn = useSpring({
     from: { opacity: 0, transform: "translateY(20px)" },
     to: { opacity: 1, transform: "translateY(0)" },
-    config: { duration: 1000 },
+    config: { duration: 250 },
   });
 
   if (loading) return <div className="p-6">Memuat data...</div>;
@@ -72,9 +72,7 @@ const DokumentasiPage = () => {
   return (
     <animated.div style={fadeIn} className="flex-1 p-8 bg-gray-100">
       <div className="flex flex-col items-start mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          Dokumentasi Kegiatan
-        </h1>
+        <h1 className="text-2xl font-bold mb-2">Dokumentasi Kegiatan</h1>
         <Link
           to="/admin/dokumentasi/buat"
           className="px-4 py-2 bg-yellow-100 text-gray-800 rounded-md hover:bg-yellow-200 transition-colors"

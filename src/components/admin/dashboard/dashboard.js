@@ -10,7 +10,7 @@ const Dashboard = () => {
   const fadeIn = useSpring({
     from: { opacity: 0, transform: "translateY(20px)" },
     to: { opacity: 1, transform: "translateY(0)" },
-    config: { duration: 1000 },
+    config: { duration: 250 },
   });
 
   useEffect(() => {
@@ -127,7 +127,7 @@ const Dashboard = () => {
 
   return (
     <animated.div style={fadeIn}>
-      <div className="p-6">
+      <div className="p-8">
         <div className="mb-8">
           <h1 className="text-2xl font-bold mb-2">Dashboard Admin</h1>
           <p className="text-sm text-gray-500">

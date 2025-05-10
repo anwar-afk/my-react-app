@@ -8,7 +8,7 @@ const LaporanKeuangan = () => {
   const fadeIn = useSpring({
     from: { opacity: 0, transform: "translateY(20px)" },
     to: { opacity: 1, transform: "translateY(0)" },
-    config: { duration: 1000 },
+    config: { duration: 250 },
   });
 
   const reports = [
@@ -21,8 +21,8 @@ const LaporanKeuangan = () => {
   const visibleReports = reports; // Display all reports without slicing
 
   return (
-    <animated.div style={fadeIn} className="container mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold text-black mb-6">Keuangan Tahunan</h1>
+    <animated.div style={fadeIn} className="container mx-auto px-8 py-8">
+      <h1 className="text-2xl font-bold mb-2">Keuangan Tahunan</h1>
 
       <div className="mb-12">
         <div className="flex justify-between items-center mb-6">

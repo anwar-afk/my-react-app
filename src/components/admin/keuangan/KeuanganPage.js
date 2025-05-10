@@ -11,7 +11,7 @@ const KeuanganPage = () => {
   const fadeIn = useSpring({
     from: { opacity: 0, transform: "translateY(20px)" },
     to: { opacity: 1, transform: "translateY(0)" },
-    config: { duration: 1000 },
+    config: { duration: 250 },
   });
 
   useEffect(() => {
@@ -34,8 +34,8 @@ const KeuanganPage = () => {
 
   return (
     <animated.div style={fadeIn}>
-      <div className="p-6">
-        <h1 className="text-2xl font-bold mb-6">Dashboard Keuangan</h1>
+      <div className="p-8">
+        <h1 className="text-2xl font-bold mb-2">Dashboard Keuangan</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {campaignData.map((campaign) => (
             <CampaignStatisticCard

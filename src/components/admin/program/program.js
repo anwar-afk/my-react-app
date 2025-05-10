@@ -163,15 +163,13 @@ const ProgramPage = () => {
   const fadeIn = useSpring({
     from: { opacity: 0, transform: "translateY(20px)" },
     to: { opacity: 1, transform: "translateY(0)" },
-    config: { duration: 1000 },
+    config: { duration: 250 },
   });
 
   return (
     <animated.div style={fadeIn}>
       <div className="flex-1 p-8 bg-gray-100">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">
-          Daftar Program
-        </h1>
+        <h1 className="text-2xl font-bold mb-2">Daftar Program</h1>
 
         {notification && (
           <div
