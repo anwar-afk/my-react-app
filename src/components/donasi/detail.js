@@ -1,19 +1,20 @@
-import React, { useEffect, useState, useContext, useRef } from 'react';
-import { useParams } from 'react-router-dom';
-import { useSpring, animated } from '@react-spring/web';
-import { getCampaigns } from '../../services/campaignService';
-import { AuthContext } from '../../context/AuthContext';
-import { createDonation } from '../../services/donateService';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import { Navigation, Pagination } from 'swiper/modules';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import React, { useEffect, useState, useContext, useRef } from "react";
+import { useParams } from "react-router-dom";
+import { useSpring, animated } from "@react-spring/web";
+import { getCampaigns } from "../../services/campaignService";
+import { AuthContext } from "../../context/AuthContext";
+import { createDonation } from "../../services/donateService";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import { Navigation, Pagination } from "swiper/modules";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import Swal from "sweetalert2";
 
 // Base API URL
-const baseUrl = 'http://localhost:5000';
+const baseUrl = "http://localhost:5000";
 
 const DonationDetailPage = () => {
   const { id } = useParams();
@@ -22,7 +23,7 @@ const DonationDetailPage = () => {
   const [error, setError] = useState(null);
   const { user } = useContext(AuthContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState("");
   const [donationError, setDonationError] = useState(null);
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
@@ -42,12 +43,17 @@ const DonationDetailPage = () => {
         console.log("✅ Fetched campaigns:", response);
         console.log("🔍 Looking for campaign with ID:", id);
 
-        if (response && response.campaigns && Array.isArray(response.campaigns)) {
-          const selectedCampaign = response.campaigns.find(campaign => 
-            campaign.id === id || 
-            campaign.id === parseInt(id) || 
-            campaign.id.toString() === id ||
-            campaign._id === id
+        if (
+          response &&
+          response.campaigns &&
+          Array.isArray(response.campaigns)
+        ) {
+          const selectedCampaign = response.campaigns.find(
+            (campaign) =>
+              campaign.id === id ||
+              campaign.id === parseInt(id) ||
+              campaign.id.toString() === id ||
+              campaign._id === id
           );
 
           if (selectedCampaign) {
@@ -76,33 +82,36 @@ const DonationDetailPage = () => {
   useEffect(() => {
     if (campaign && mapRef.current) {
       // Default coordinates if not set
-      const lat = campaign.latitude || -6.200000;
+      const lat = campaign.latitude || -6.2;
       const lng = campaign.longitude || 106.816666;
 
       if (!mapInstanceRef.current) {
         console.log("🗺️ Initializing map with coordinates:", { lat, lng });
-        
+
         // Initialize map
         mapInstanceRef.current = L.map(mapRef.current).setView([lat, lng], 13);
-        
+
         // Add tile layer
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         }).addTo(mapInstanceRef.current);
-        
+
         // Add marker with popup
         markerRef.current = L.marker([lat, lng])
-          .bindPopup(`
+          .bindPopup(
+            `
             <div class="text-center">
               <h3 class="font-bold">${campaign.title}</h3>
               <p class="text-sm">${campaign.category}</p>
             </div>
-          `)
+          `
+          )
           .addTo(mapInstanceRef.current);
 
         // Open popup by default
         markerRef.current.openPopup();
-        
+
         // Force a resize after a small delay to ensure proper rendering
         setTimeout(() => {
           mapInstanceRef.current.invalidateSize();
@@ -123,7 +132,11 @@ const DonationDetailPage = () => {
   // Modal handlers and donation submission
   const openModal = () => {
     if (!user) {
-      alert("Harap login dulu jika ingin berdonasi.");
+      Swal.fire({
+        icon: "warning",
+        title: "Harap Login",
+        text: "Harap login dulu jika ingin berdonasi.",
+      });
       return;
     }
     setIsModalOpen(true);
@@ -131,7 +144,7 @@ const DonationDetailPage = () => {
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setAmount('');
+    setAmount("");
     setDonationError(null);
   };
 
@@ -144,7 +157,10 @@ const DonationDetailPage = () => {
     }
 
     try {
-      console.log("🔼 Sending donation request:", { campaignId: id, amount: Number(amount) });
+      console.log("🔼 Sending donation request:", {
+        campaignId: id,
+        amount: Number(amount),
+      });
 
       const response = await createDonation(id, Number(amount));
 
@@ -153,25 +169,39 @@ const DonationDetailPage = () => {
       if (response.success && response.paymentUrl) {
         window.location.href = response.paymentUrl; // Redirect to payment page
       } else {
-        setDonationError(response.message || "Gagal membuat donasi. Silakan coba lagi.");
+        setDonationError(
+          response.message || "Gagal membuat donasi. Silakan coba lagi."
+        );
       }
     } catch (error) {
       console.error("❌ Error creating donation:", error);
-      setDonationError(error.response?.data?.message || "Terjadi kesalahan saat membuat donasi.");
+      setDonationError(
+        error.response?.data?.message ||
+          "Terjadi kesalahan saat membuat donasi."
+      );
     }
   };
 
-  if (loading) return <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-    <p className="text-gray-600">Memuat data campaign...</p>
-  </div>;
+  if (loading)
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-600">Memuat data campaign...</p>
+      </div>
+    );
 
-  if (error) return <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-    <p className="text-red-600">{error}</p>
-  </div>;
+  if (error)
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-red-600">{error}</p>
+      </div>
+    );
 
-  if (!campaign) return <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-    <p className="text-gray-600">Data campaign tidak ditemukan.</p>
-  </div>;
+  if (!campaign)
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-600">Data campaign tidak ditemukan.</p>
+      </div>
+    );
 
   return (
     <animated.div style={fadeIn} className="min-h-screen bg-gray-50">
@@ -193,7 +223,7 @@ const DonationDetailPage = () => {
                   <SwiperSlide key={index}>
                     <img
                       src={`${baseUrl}${image}`}
-                      alt={`Campaign Image ${index + 1}`}
+                      alt=""
                       className="w-full h-64 lg:h-96 object-contain rounded-lg"
                     />
                   </SwiperSlide>
@@ -202,7 +232,7 @@ const DonationDetailPage = () => {
                 <SwiperSlide>
                   <img
                     src="https://via.placeholder.com/150"
-                    alt="Placeholder Image"
+                    alt=""
                     className="w-full h-64 lg:h-96 object-cover rounded-lg"
                   />
                 </SwiperSlide>
@@ -212,10 +242,19 @@ const DonationDetailPage = () => {
 
           {/* Campaign Details */}
           <div className="bg-white p-6 lg:p-8 rounded-lg shadow-md">
-            <span className="text-sm text-green-600 bg-green-100 px-3 py-1 rounded-full">{campaign.category}</span>
-            <h2 className="text-2xl lg:text-3xl font-bold text-gray-800 mt-4">{campaign.title}</h2>
-            <p className="text-gray-600 mt-4 text-lg leading-relaxed">{campaign.detail}</p>
-            <button onClick={openModal} className="w-full mt-6 px-6 py-3 bg-green-500 text-white text-lg rounded-full shadow-md hover:bg-green-600">
+            <span className="text-sm text-green-600 bg-green-100 px-3 py-1 rounded-full">
+              {campaign.category}
+            </span>
+            <h2 className="text-2xl lg:text-3xl font-bold text-gray-800 mt-4">
+              {campaign.title}
+            </h2>
+            <p className="text-gray-600 mt-4 text-lg leading-relaxed">
+              {campaign.detail}
+            </p>
+            <button
+              onClick={openModal}
+              className="w-full mt-6 px-6 py-3 bg-green-500 text-white text-lg rounded-full shadow-md hover:bg-green-600"
+            >
               Donasi Sekarang
             </button>
           </div>
@@ -223,11 +262,13 @@ const DonationDetailPage = () => {
 
         {/* Map Section - Added margin and explicit height */}
         <div className="mt-8 bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-xl font-bold text-gray-800 mb-4">Lokasi Program</h3>
-          <div 
+          <h3 className="text-xl font-bold text-gray-800 mb-4">
+            Lokasi Program
+          </h3>
+          <div
             ref={mapRef}
             className="w-full h-[400px] rounded-lg"
-            style={{ minHeight: '400px' }}
+            style={{ minHeight: "400px" }}
           />
         </div>
       </main>
@@ -236,10 +277,14 @@ const DonationDetailPage = () => {
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Donasi Sekarang</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+              Donasi Sekarang
+            </h2>
             <form onSubmit={handleDonationSubmit}>
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">Jumlah Donasi (Rp)</label>
+                <label className="block text-gray-700 text-sm font-bold mb-2">
+                  Jumlah Donasi (Rp)
+                </label>
                 <input
                   type="number"
                   value={amount}
@@ -249,10 +294,23 @@ const DonationDetailPage = () => {
                   required
                 />
               </div>
-              {donationError && <p className="text-red-500 text-sm mb-4">{donationError}</p>}
+              {donationError && (
+                <p className="text-red-500 text-sm mb-4">{donationError}</p>
+              )}
               <div className="flex justify-end space-x-4">
-                <button type="button" onClick={closeModal} className="px-4 py-2 bg-gray-500 text-white rounded-lg">Batal</button>
-                <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded-lg">Donasi</button>
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className="px-4 py-2 bg-gray-500 text-white rounded-lg"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-green-500 text-white rounded-lg"
+                >
+                  Donasi
+                </button>
               </div>
             </form>
           </div>

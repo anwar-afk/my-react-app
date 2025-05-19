@@ -1,18 +1,19 @@
-import React, { useState, useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { login } from '../services/authService';
-import { AuthContext } from '../context/AuthContext';
+import React, { useState, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { login } from "../services/authService";
+import { AuthContext } from "../context/AuthContext";
+import Swal from "sweetalert2";
 
 const LoginPage = () => {
-  const [formData, setFormData] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { login: authLogin } = useContext(AuthContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(''); // Reset error message before attempting login
+    setError(""); // Reset error message before attempting login
 
     try {
       const response = await login(formData);
@@ -22,14 +23,22 @@ const LoginPage = () => {
           token: response.token,
           role: response.user.role,
         });
-        navigate(response.user.role === 'admin' ? '/admin' : '/');
+        navigate(response.user.role === "admin" ? "/admin" : "/");
       } else {
-        setError('Email atau password salah');
-        alert('Email atau password salah');
+        setError("Email atau password salah");
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Email atau password salah",
+        });
       }
     } catch (err) {
-      setError(err.message || 'Email atau password salah');
-      alert('Email atau password salah');
+      setError(err.message || "Email atau password salah");
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Email atau password salah",
+      });
     }
   };
 
@@ -73,7 +82,7 @@ const LoginPage = () => {
               </label>
               <input
                 name="password"
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 required
                 className="w-full px-4 py-3 rounded-full border border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 value={formData.password}
@@ -101,7 +110,7 @@ const LoginPage = () => {
           </form>
 
           <p className="mt-8 text-center text-sm text-gray-600">
-            Don't have an account?{' '}
+            Don't have an account?{" "}
             <Link
               to="/register"
               className="text-green-500 hover:text-green-600 font-medium"

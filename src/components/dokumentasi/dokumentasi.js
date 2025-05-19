@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSpring, animated } from "@react-spring/web";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const Album = () => {
   const [documentations, setDocumentations] = useState([]);
@@ -8,6 +9,9 @@ const Album = () => {
   const [error, setError] = useState(null);
   const [selectedYear, setSelectedYear] = useState("ALL");
   const [currentImageIndexes, setCurrentImageIndexes] = useState({});
+  const [title, setTitle] = useState("");
+  const [date, setDate] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Fetch data dokumentasi dari API
   useEffect(() => {
@@ -46,11 +50,11 @@ const Album = () => {
   const handleNextImage = (docId) => {
     setCurrentImageIndexes((prevIndexes) => {
       const currentIndex = prevIndexes[docId] || 0;
-      const doc = documentations.find(d => d._id === docId);
+      const doc = documentations.find((d) => d._id === docId);
       const maxIndex = doc.images.length - 1;
       return {
         ...prevIndexes,
-        [docId]: currentIndex >= maxIndex ? 0 : currentIndex + 1
+        [docId]: currentIndex >= maxIndex ? 0 : currentIndex + 1,
       };
     });
   };
@@ -59,11 +63,11 @@ const Album = () => {
   const handlePrevImage = (docId) => {
     setCurrentImageIndexes((prevIndexes) => {
       const currentIndex = prevIndexes[docId] || 0;
-      const doc = documentations.find(d => d._id === docId);
+      const doc = documentations.find((d) => d._id === docId);
       const maxIndex = doc.images.length - 1;
       return {
         ...prevIndexes,
-        [docId]: currentIndex <= 0 ? maxIndex : currentIndex - 1
+        [docId]: currentIndex <= 0 ? maxIndex : currentIndex - 1,
       };
     });
   };
@@ -71,28 +75,56 @@ const Album = () => {
   // Filter dokumentasi berdasarkan tahun
   const filteredDocumentations = documentations.filter((doc) => {
     if (selectedYear === "ALL") return true;
-    
+
     const docYear = new Date(doc.date).getFullYear().toString();
     return docYear === selectedYear;
   });
 
   // Mendapatkan tahun unik dari dokumentasi
   const getYears = () => {
-    const years = documentations.map(doc => new Date(doc.date).getFullYear().toString());
+    const years = documentations.map((doc) =>
+      new Date(doc.date).getFullYear().toString()
+    );
     return ["ALL", ...new Set(years)].sort();
   };
 
+  const handleModalOpen = () => {
+    setTitle(""); // Reset title to empty
+    setDate(""); // Reset date to empty
+    setIsModalOpen(true);
+  };
+
+  const handleSuccessAlert = () => {
+    Swal.fire({
+      title: "Berhasil!",
+      text: "Dokumentasi berhasil ditambahkan.",
+      icon: "success",
+      confirmButtonText: "OK",
+    });
+  };
+
+  const handleErrorAlert = (message) => {
+    Swal.fire({
+      title: "Gagal!",
+      text: message || "Terjadi kesalahan.",
+      icon: "error",
+      confirmButtonText: "OK",
+    });
+  };
+
   if (loading) return <div className="text-center py-20">Loading...</div>;
-  if (error) return <div className="text-center py-20 text-red-600">Error: {error}</div>;
+  if (error)
+    return <div className="text-center py-20 text-red-600">Error: {error}</div>;
 
   return (
     <animated.div style={fadeProps} className="container mx-auto px-4 py-12">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold text-gray-800 mb-4">Dokumentasi</h1>
         <p className="text-gray-600 max-w-2xl mx-auto">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-          aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
-          magna aliqua.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+          eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem
+          ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+          tempor incididunt ut labore et dolore magna aliqua.
         </p>
       </div>
 
@@ -114,16 +146,21 @@ const Album = () => {
       </div>
 
       {selectedYear !== "ALL" && (
-        <h2 className="text-3xl font-bold text-gray-800 mb-8">{selectedYear}</h2>
+        <h2 className="text-3xl font-bold text-gray-800 mb-8">
+          {selectedYear}
+        </h2>
       )}
 
       {/* Grid dokumentasi */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {filteredDocumentations.map((doc) => {
           const currentImageIndex = currentImageIndexes[doc._id] || 0;
-          
+
           return (
-            <div key={doc._id} className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
+            <div
+              key={doc._id}
+              className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
+            >
               <div className="relative">
                 {doc.images && doc.images.length > 0 && (
                   <div className="relative">
@@ -134,26 +171,48 @@ const Album = () => {
                     />
                     {doc.images.length > 1 && (
                       <div className="absolute inset-0 flex items-center justify-between px-2">
-                        <button 
+                        <button
                           onClick={(e) => {
                             e.preventDefault();
                             handlePrevImage(doc._id);
                           }}
                           className="bg-white bg-opacity-70 rounded-full p-2 text-gray-700 hover:bg-opacity-100"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-6 w-6"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M15 19l-7-7 7-7"
+                            />
                           </svg>
                         </button>
-                        <button 
+                        <button
                           onClick={(e) => {
                             e.preventDefault();
                             handleNextImage(doc._id);
                           }}
                           className="bg-white bg-opacity-70 rounded-full p-2 text-gray-700 hover:bg-opacity-100"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-6 w-6"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 5l7 7-7 7"
+                            />
                           </svg>
                         </button>
                       </div>
@@ -167,7 +226,9 @@ const Album = () => {
                     {doc.category || "Donasi Jum'at Berkah"}
                   </span>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-1">{doc.title}</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-1">
+                  {doc.title}
+                </h3>
               </div>
             </div>
           );

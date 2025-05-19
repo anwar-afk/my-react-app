@@ -3,6 +3,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import ProgramForm from "../JS_programForm";
 import { useSpring, animated } from "@react-spring/web";
+import Swal from "sweetalert2";
 
 const ProgramPage = () => {
   const [selectedProgram, setSelectedProgram] = useState(null);
@@ -84,20 +85,28 @@ const ProgramPage = () => {
   };
 
   const handleDeleteProgram = async (campaignId) => {
-    if (window.confirm("Apakah Anda yakin ingin menghapus program ini?")) {
+    const result = await Swal.fire({
+      title: "Apakah Anda yakin?",
+      text: "Program ini akan dihapus secara permanen!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Ya, hapus!",
+      cancelButtonText: "Batal",
+    });
+
+    if (result.isConfirmed) {
       try {
         const url = `${baseUrl}/api/campaigns/${campaignId}`;
-        console.log("Deleting program at:", url);
-
         await axios.delete(url, {
           headers: { Authorization: `Bearer ${token}` },
         });
-
         fetchCampaigns();
-        showNotification("Program berhasil dihapus!", "success");
+        Swal.fire("Dihapus!", "Program berhasil dihapus.", "success");
       } catch (error) {
         console.error("Error deleting program:", error);
-        showNotification("Gagal menghapus program.", "error");
+        Swal.fire("Gagal!", "Gagal menghapus program.", "error");
       }
     }
   };

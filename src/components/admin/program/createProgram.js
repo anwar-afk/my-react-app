@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from "react";
+import axios from "axios";
+import Swal from "sweetalert2";
 
 const CreateProgram = () => {
   const [formData, setFormData] = useState({
-    title: '',
-    detail: '',
-    category: '',
-    startDate: '',
-    endDate: '',
-    target: '',
+    title: "",
+    detail: "",
+    category: "",
+    startDate: "",
+    endDate: "",
+    target: "",
     images: [], // Menyimpan file gambar yang dipilih
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   // Fungsi untuk mengubah input teks
   const handleChange = (e) => {
@@ -27,7 +28,7 @@ const CreateProgram = () => {
   const handleFileChange = (e) => {
     // Ambil semua file yang dipilih
     const files = Array.from(e.target.files);
-    console.log('Files selected:', files); // Debugging: Cek file yang dipilih
+    console.log("Files selected:", files); // Debugging: Cek file yang dipilih
     setFormData({
       ...formData,
       images: files, // Simpan file-file yang dipilih ke state
@@ -38,53 +39,61 @@ const CreateProgram = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     // Buat objek FormData untuk mengirim file
     const data = new FormData();
-    data.append('title', formData.title);
-    data.append('detail', formData.detail);
-    data.append('category', formData.category);
-    data.append('startDate', formData.startDate);
-    data.append('endDate', formData.endDate);
-    data.append('target', formData.target);
+    data.append("title", formData.title);
+    data.append("detail", formData.detail);
+    data.append("category", formData.category);
+    data.append("startDate", formData.startDate);
+    data.append("endDate", formData.endDate);
+    data.append("target", formData.target);
 
     // Tambahkan semua file gambar ke FormData
     formData.images.forEach((image, index) => {
-      data.append('images', image); // Gunakan 'images' sebagai key untuk backend
+      data.append("images", image); // Gunakan 'images' sebagai key untuk backend
     });
 
-    console.log('FormData to be sent:', data); // Debugging: Cek FormData sebelum dikirim
+    console.log("FormData to be sent:", data); // Debugging: Cek FormData sebelum dikirim
 
     try {
       // Kirim data ke backend
       const response = await axios.post(
-        'http://localhost:5000/api/campaigns',
+        "http://localhost:5000/api/campaigns",
         data,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
 
-      console.log('Response:', response.data);
-      alert('Program berhasil dibuat!');
+      console.log("Response:", response.data);
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil",
+        text: "Program berhasil dibuat.",
+      });
 
       // Reset form setelah berhasil
       setFormData({
-        title: '',
-        detail: '',
-        category: '',
-        startDate: '',
-        endDate: '',
-        target: '',
+        title: "",
+        detail: "",
+        category: "",
+        startDate: "",
+        endDate: "",
+        target: "",
         images: [],
       });
     } catch (err) {
-      setError('Gagal membuat program. Silakan coba lagi.');
-      console.error('Error:', err);
+      Swal.fire({
+        icon: "error",
+        title: "Gagal",
+        text: "Terjadi kesalahan saat membuat program.",
+      });
+      console.error("Error:", err);
     } finally {
       setLoading(false);
     }
@@ -226,7 +235,7 @@ const CreateProgram = () => {
           disabled={loading}
           className="w-full py-3 px-4 rounded-lg bg-blue-500 text-white font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
-          {loading ? 'Membuat Program...' : 'Buat Program'}
+          {loading ? "Membuat Program..." : "Buat Program"}
         </button>
       </form>
     </div>

@@ -70,7 +70,7 @@ const LaporanKeuangan = () => {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-4xl">
             <h2 className="text-xl font-bold mb-4">Tambah Laporan Tahunan</h2>
             <form>
               <div className="mb-4">

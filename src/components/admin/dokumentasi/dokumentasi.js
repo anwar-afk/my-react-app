@@ -2,12 +2,17 @@ import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { useSpring, animated } from "@react-spring/web";
+import Swal from "sweetalert2";
 
 const DokumentasiPage = () => {
   const [dokumentasi, setDokumentasi] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [notification, setNotification] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [title, setTitle] = useState("");
+  const [date, setDate] = useState("");
+  const [images, setImages] = useState([]);
 
   const token = localStorage.getItem("token");
   const baseUrl = "http://localhost:5000";
@@ -31,16 +36,27 @@ const DokumentasiPage = () => {
   }, [fetchDokumentasi]);
 
   const handleDelete = async (id) => {
-    if (window.confirm("Apakah Anda yakin ingin menghapus dokumentasi ini?")) {
+    const result = await Swal.fire({
+      title: "Apakah Anda yakin?",
+      text: "Dokumentasi ini akan dihapus secara permanen!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Ya, hapus!",
+      cancelButtonText: "Batal",
+    });
+
+    if (result.isConfirmed) {
       try {
         await axios.delete(`${baseUrl}/api/documentations/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        showNotification("Dokumentasi berhasil dihapus!", "success");
+        Swal.fire("Dihapus!", "Dokumentasi berhasil dihapus.", "success");
         fetchDokumentasi();
       } catch (error) {
         console.error("Error deleting dokumentasi:", error);
-        showNotification("Gagal menghapus dokumentasi.", "error");
+        Swal.fire("Gagal!", "Gagal menghapus dokumentasi.", "error");
       }
     }
   };
@@ -50,6 +66,10 @@ const DokumentasiPage = () => {
     setTimeout(() => {
       setNotification(null);
     }, 3000);
+  };
+
+  const handleSuccessNotification = () => {
+    showNotification("Dokumentasi berhasil dibuat!", "success");
   };
 
   const formatDate = (dateString) => {
@@ -66,6 +86,49 @@ const DokumentasiPage = () => {
     config: { duration: 250 },
   });
 
+  const handleModalOpen = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleImageChange = (e) => {
+    setImages(Array.from(e.target.files));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("date", date);
+      images.forEach((image) => {
+        formData.append("images", image);
+      });
+
+      const token = localStorage.getItem("token");
+      await axios.post(`${baseUrl}/api/documentations`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      handleSuccessNotification();
+      fetchDokumentasi();
+      handleModalClose();
+    } catch (err) {
+      setError("Gagal membuat dokumentasi.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) return <div className="p-6">Memuat data...</div>;
   if (error) return <div className="p-6 text-red-500">{error}</div>;
 
@@ -73,12 +136,12 @@ const DokumentasiPage = () => {
     <animated.div style={fadeIn} className="flex-1 p-8 bg-gray-100">
       <div className="flex flex-col items-start mb-6">
         <h1 className="text-2xl font-bold mb-2">Dokumentasi Kegiatan</h1>
-        <Link
-          to="/admin/dokumentasi/buat"
+        <button
+          onClick={handleModalOpen}
           className="px-4 py-2 bg-yellow-100 text-gray-800 rounded-md hover:bg-yellow-200 transition-colors"
         >
           + Buat Dokumentasi
-        </Link>
+        </button>
       </div>
 
       {notification && (
@@ -90,6 +153,80 @@ const DokumentasiPage = () => {
           }`}
         >
           {notification.message}
+        </div>
+      )}
+
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-4xl">
+            <h2 className="text-xl font-bold mb-4">Buat Dokumentasi Baru</h2>
+            <form onSubmit={handleSubmit}>
+              <div className="mb-4">
+                <label
+                  htmlFor="title"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Judul Dokumentasi
+                </label>
+                <input
+                  type="text"
+                  id="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label
+                  htmlFor="date"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Tanggal Kegiatan
+                </label>
+                <input
+                  type="date"
+                  id="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  required
+                />
+              </div>
+              <div className="mb-6">
+                <label
+                  htmlFor="images"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Gambar Dokumentasi
+                </label>
+                <input
+                  type="file"
+                  id="images"
+                  onChange={handleImageChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  accept="image/*"
+                  multiple
+                  required
+                />
+              </div>
+              <div className="flex justify-end space-x-3">
+                <button
+                  type="button"
+                  onClick={handleModalClose}
+                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+                >
+                  Simpan Dokumentasi
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
