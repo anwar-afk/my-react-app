@@ -83,7 +83,7 @@ const Navbar = () => {
         <Link
           to="/"
           className={`block lg:inline-block text-gray-800 hover:text-green-600 transition-colors duration-200 py-2 px-3 lg:py-0 lg:px-2${
-            isActive("/") ? " text-green-600 font-semibold" : ""
+            isActive("/") ? " text-green-600" : ""
           }`}
         >
           Home
@@ -91,7 +91,7 @@ const Navbar = () => {
         <Link
           to="/donasi"
           className={`block lg:inline-block text-gray-800 hover:text-green-600 transition-colors duration-200 py-2 px-3 lg:py-0 lg:px-2${
-            isActive("/donasi") ? " text-green-600 font-semibold" : ""
+            isActive("/donasi") ? " text-green-600" : ""
           }`}
         >
           Donasi
@@ -99,7 +99,7 @@ const Navbar = () => {
         <Link
           to="/dokumentasi"
           className={`block lg:inline-block text-gray-800 hover:text-green-600 transition-colors duration-200 py-2 px-3 lg:py-0 lg:px-2${
-            isActive("/dokumentasi") ? " text-green-600 font-semibold" : ""
+            isActive("/dokumentasi") ? " text-green-600" : ""
           }`}
         >
           Dokumentasi
@@ -107,7 +107,7 @@ const Navbar = () => {
         <Link
           to="/laporan"
           className={`block lg:inline-block text-gray-800 hover:text-green-600 transition-colors duration-200 py-2 px-3 lg:py-0 lg:px-2${
-            isActive("/laporan") ? " text-green-600 font-semibold" : ""
+            isActive("/laporan") ? " text-green-600" : ""
           }`}
         >
           Laporan
@@ -115,7 +115,7 @@ const Navbar = () => {
         <Link
           to="/tentang"
           className={`block lg:inline-block text-gray-800 hover:text-green-600 transition-colors duration-200 py-2 px-3 lg:py-0 lg:px-2${
-            isActive("/tentang") ? " text-green-600 font-semibold" : ""
+            isActive("/tentang") ? " text-green-600" : ""
           }`}
         >
           Tentang
