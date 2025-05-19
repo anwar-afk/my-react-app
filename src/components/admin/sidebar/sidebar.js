@@ -1,15 +1,28 @@
 import React, { useContext } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../../context/AuthContext";
+import Swal from "sweetalert2";
 
 const Sidebar = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
+  const handleLogout = async () => {
+    const result = await Swal.fire({
+      title: "Keluar dari Admin?",
+      text: "Anda yakin ingin logout?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Ya, keluar",
+      cancelButtonText: "Batal",
+    });
+    if (result.isConfirmed) {
+      logout();
+      navigate("/login");
+    }
   };
 
   // Check if the current path matches the link
