@@ -10,7 +10,7 @@ function FadeInComponent({ children }) {
   const styles = useSpring({
     opacity: inView ? 1 : 0,
     transform: inView ? "translateY(0)" : "translateY(20px)",
-    config: { duration: 250 }, // durasi animasi dipercepat menjadi 250ms
+    config: { duration: 500 }, 
   });
 
   return (

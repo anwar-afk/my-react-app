@@ -70,35 +70,84 @@ const LoginPage = () => {
                 name="email"
                 type="email"
                 required
-                className="w-full px-4 py-3 rounded-full border border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-3 rounded-full border border-gray-300 focus:ring focus:ring-green-500 focus:border-green-500 focus:outline-none"
                 value={formData.email}
                 onChange={handleChange}
               />
             </div>
 
-            <div className="relative">
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Password:
               </label>
-              <input
-                name="password"
-                type={showPassword ? "text" : "password"}
-                required
-                className="w-full px-4 py-3 rounded-full border border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                value={formData.password}
-                onChange={handleChange}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
-              >
-                {showPassword ? (
-                  <i className="far fa-eye-slash"></i>
-                ) : (
-                  <i className="far fa-eye"></i>
-                )}
-              </button>
+              <div className="flex items-center relative">
+                <input
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  className="w-full px-4 py-3 rounded-full border border-gray-300 focus:ring focus:ring-green-500 focus:border-green-500 focus:outline-none"
+                  value={formData.password}
+                  onChange={handleChange}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="ml-2 absolute right-4 top-1/2 -translate-y-1/2 flex items-center text-sm leading-5 focus:outline-none bg-transparent"
+                  tabIndex={-1}
+                  aria-label={
+                    showPassword ? "Sembunyikan password" : "Lihat password"
+                  }
+                >
+                  {showPassword ? (
+                    // Eye SVG (terbuka)
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="h-5 w-5 text-gray-500"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                      />
+                    </svg>
+                  ) : (
+                    // Eye-off SVG (tertutup)
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="h-5 w-5 text-gray-500"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M3 3l18 18"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M3.98 8.223A10.477 10.477 0 001.934 12.001C3.226 15.272 7.05 19.5 12 19.5c1.772 0 3.432-.457 4.899-1.277m2.121-1.636A10.45 10.45 0 0022.066 12c-1.292-3.271-5.116-7.5-10.066-7.5-1.07 0-2.104.154-3.09.44"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
 
             <button

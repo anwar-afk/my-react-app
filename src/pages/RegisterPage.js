@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { register } from '../services/authService';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { register } from "../services/authService";
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    phone: '',
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    phone: "",
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ const RegisterPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       return;
     }
     try {
@@ -28,9 +28,9 @@ const RegisterPage = () => {
         password: formData.password,
         phone: formData.phone,
       });
-      navigate('/login');
+      navigate("/login");
     } catch (err) {
-      setError(err.message || 'Terjadi kesalahan saat registrasi');
+      setError(err.message || "Terjadi kesalahan saat registrasi");
     }
   };
 
@@ -42,13 +42,20 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-green-50">
+    <div className="h-screen min-h-screen flex flex-col md:flex-row bg-green-50">
       {/* Image Section */}
-      <div className="w-full md:w-1/2 bg-green-50 flex items-center justify-center p-6 md:p-0">
+      <div className="w-full md:w-1/2 bg-green-50 flex items-stretch justify-center p-0 m-0">
         <img
           src="/image/register-image.png"
           alt="Register Illustration"
-          className="max-w-full h-auto md:max-w-md"
+          className="w-full h-full max-w-xl object-contain md:rounded-none m-0"
+          style={{
+            height: "100vh",
+            minHeight: "100vh",
+            maxHeight: "100vh",
+            marginTop: 0,
+            marginRight: 0,
+          }}
         />
       </div>
 
@@ -65,7 +72,7 @@ const RegisterPage = () => {
             value={formData.name}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:ring focus:ring-green-500 focus:outline-none"
+            className="w-full px-4 py-3 border border-gray-300 rounded-full focus:ring focus:ring-green-500 focus:outline-none"
           />
           <input
             type="email"
@@ -74,7 +81,7 @@ const RegisterPage = () => {
             value={formData.email}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:ring focus:ring-green-500 focus:outline-none"
+            className="w-full px-4 py-3 border border-gray-300 rounded-full focus:ring focus:ring-green-500 focus:outline-none"
           />
           <input
             type="tel"
@@ -83,61 +90,153 @@ const RegisterPage = () => {
             value={formData.phone}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:ring focus:ring-green-500 focus:outline-none"
+            className="w-full px-4 py-3 border border-gray-300 rounded-full focus:ring focus:ring-green-500 focus:outline-none"
           />
           <div className="relative">
             <input
-              type={showPassword ? 'text' : 'password'}
               name="password"
-              placeholder="Password"
+              type={showPassword ? "text" : "password"}
+              required
+              className="w-full px-4 py-3 rounded-full border border-gray-300 focus:ring focus:ring-green-500 focus:border-green-500 focus:outline-none"
               value={formData.password}
               onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded focus:ring focus:ring-green-500 focus:outline-none"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+              className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center text-sm leading-5 focus:outline-none bg-transparent"
+              tabIndex={-1}
+              aria-label={
+                showPassword ? "Sembunyikan password" : "Lihat password"
+              }
             >
-              {showPassword ? (
-                <i className="far fa-eye-slash"></i>
+              {!showPassword ? (
+                // Eye-off SVG (tertutup)
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="h-5 w-5 text-gray-500"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3 3l18 18"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3.98 8.223A10.477 10.477 0 001.934 12.001C3.226 15.272 7.05 19.5 12 19.5c1.772 0 3.432-.457 4.899-1.277m2.121-1.636A10.45 10.45 0 0022.066 12c-1.292-3.271-5.116-7.5-10.066-7.5-1.07 0-2.104.154-3.09.44"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
               ) : (
-                <i className="far fa-eye"></i>
+                // Eye SVG (terbuka)
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="h-5 w-5 text-gray-500"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                  />
+                </svg>
               )}
             </button>
           </div>
-          <div className="relative">
+          <div className="relative mt-4">
             <input
-              type={showConfirmPassword ? 'text' : 'password'}
               name="confirmPassword"
-              placeholder="Confirm Password"
+              type={showConfirmPassword ? "text" : "password"}
+              required
+              className="w-full px-4 py-3 rounded-full border border-gray-300 focus:ring focus:ring-green-500 focus:border-green-500 focus:outline-none"
               value={formData.confirmPassword}
               onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded focus:ring focus:ring-green-500 focus:outline-none"
             />
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+              className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center text-sm leading-5 focus:outline-none bg-transparent"
+              tabIndex={-1}
+              aria-label={
+                showConfirmPassword ? "Sembunyikan password" : "Lihat password"
+              }
             >
-              {showConfirmPassword ? (
-                <i className="far fa-eye-slash"></i>
+              {!showConfirmPassword ? (
+                // Eye-off SVG (tertutup)
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="h-5 w-5 text-gray-500"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3 3l18 18"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3.98 8.223A10.477 10.477 0 001.934 12.001C3.226 15.272 7.05 19.5 12 19.5c1.772 0 3.432-.457 4.899-1.277m2.121-1.636A10.45 10.45 0 0022.066 12c-1.292-3.271-5.116-7.5-10.066-7.5-1.07 0-2.104.154-3.09.44"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
               ) : (
-                <i className="far fa-eye"></i>
+                // Eye SVG (terbuka)
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="h-5 w-5 text-gray-500"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                  />
+                </svg>
               )}
             </button>
           </div>
           <button
             type="submit"
-            className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600 focus:ring focus:ring-green-500"
+            className="w-full py-3 px-4 rounded-full bg-green-500 text-white text-lg font-medium hover:bg-green-600 focus:ring focus:ring-green-500 focus:outline-none transition-colors duration-200"
           >
             Register
           </button>
         </form>
         <p className="mt-4 text-sm text-gray-600">
-          Yes I have an account?{' '}
+          Yes I have an account?{" "}
           <Link to="/login" className="text-green-500 hover:underline">
             Login
           </Link>
