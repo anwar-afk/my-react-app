@@ -1,35 +1,15 @@
 import React, { useState } from "react";
 import { useSpring, animated } from "@react-spring/web";
 import Swal from "sweetalert2";
-
-const laporanDummy = [
-  {
-    id: 1,
-    title: "Laporan keuangan yayasan Tahun 2024",
-    tanggal: "12 Januari 2024",
-    dibuat: "12 Januari 2024",
-  },
-  {
-    id: 2,
-    title: "Laporan keuangan yayasan Tahun 2023",
-    tanggal: "10 Januari 2023",
-    dibuat: "10 Januari 2023",
-  },
-  {
-    id: 3,
-    title: "Laporan keuangan yayasan Tahun 2022",
-    tanggal: "8 Januari 2022",
-    dibuat: "8 Januari 2022",
-  },
-];
+import axios from "axios";
 
 const LaporanKeuangan = () => {
-  const [laporan, setLaporan] = useState(laporanDummy);
+  const [laporan, setLaporan] = useState([]); // mulai dari array kosong
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({
     title: "",
     tanggal: "",
-    file: null,
+    pdf: null, // ganti dari 'file' ke 'pdf'
   });
 
   const fadeIn = useSpring({
@@ -39,7 +19,7 @@ const LaporanKeuangan = () => {
   });
 
   const openModal = () => {
-    setForm({ title: "", tanggal: "", file: null });
+    setForm({ title: "", tanggal: "", pdf: null });
     setShowModal(true);
   };
   const closeModal = () => setShowModal(false);
@@ -52,23 +32,63 @@ const LaporanKeuangan = () => {
     }));
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (!form.title || !form.tanggal) return;
-    setLaporan([
-      ...laporan,
-      {
-        id: Date.now(),
-        title: form.title,
-        tanggal: form.tanggal,
-        dibuat: new Date().toLocaleDateString("id-ID", {
-          day: "2-digit",
-          month: "long",
-          year: "numeric",
-        }),
-      },
-    ]);
-    setShowModal(false);
+    if (!form.pdf) {
+      Swal.fire("Error", "File PDF wajib diupload", "error");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("title", form.title);
+    formData.append("pdf", form.pdf); // field harus 'pdf'
+    // Jika backend butuh tanggal, tambahkan juga:
+    formData.append("tanggal", form.tanggal);
+    const token = localStorage.getItem("token");
+    if (!token) {
+      Swal.fire(
+        "Error",
+        "Anda belum login atau token tidak ditemukan. Silakan login ulang.",
+        "error"
+      );
+      return;
+    }
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/documents/upload",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = response.data.document || response.data;
+      setLaporan([
+        ...laporan,
+        {
+          id: data.id || Date.now(),
+          title: data.title || form.title,
+          tanggal: form.tanggal,
+          dibuat: new Date().toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+          }),
+          // bisa tambahkan data.filepath jika ingin preview/download
+        },
+      ]);
+      setShowModal(false);
+      Swal.fire("Sukses", "Laporan berhasil diupload", "success");
+    } catch (err) {
+      console.error("Upload error detail:", err);
+      let msg =
+        "Gagal upload laporan (Unauthorized/Forbidden/Format Salah). Pastikan Anda admin, token valid, dan file PDF.";
+      if (err.response && err.response.data && err.response.data.message) {
+        msg = err.response.data.message;
+      }
+      Swal.fire("Error", msg, "error");
+    }
   };
 
   const handleDelete = async (id) => {
@@ -168,9 +188,11 @@ const LaporanKeuangan = () => {
                 </label>
                 <input
                   type="file"
-                  name="file"
+                  name="pdf" // ganti dari 'file' ke 'pdf'
+                  accept="application/pdf"
                   onChange={handleFormChange}
                   className="w-full border border-gray-300 rounded-lg px-5 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:outline-none text-lg"
+                  required
                 />
               </div>
               <div className="flex justify-end gap-3 mt-8">
