@@ -1,11 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { getStatistics } from "../../../services/statisticsService";
 import { useSpring, animated } from "@react-spring/web";
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import { getCampaigns } from '../../../services/campaignService';
 
 const Dashboard = () => {
   const [statistics, setStatistics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [programs, setPrograms] = useState([]);
+  const [filter, setFilter] = useState('all'); // 'all', 'active', 'inactive'
+  const mapRef = useRef(null);
+  const mapInstanceRef = useRef(null);
+  const markersLayerRef = useRef(null);
 
   const fadeIn = useSpring({
     from: { opacity: 0, transform: "translateY(20px)" },
@@ -13,14 +23,107 @@ const Dashboard = () => {
     config: { duration: 250 },
   });
 
+  // Set default icon for markers
+  const DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  });
+  L.Marker.prototype.options.icon = DefaultIcon;  // Fetch programs data
+  const fetchPrograms = async () => {
+    try {
+      const result = await getCampaigns();
+      if (result.success) {
+        setPrograms(result.campaigns);
+        console.log('Fetched programs:', result.campaigns); // For debugging
+      } else {
+        console.error('Error fetching programs:', result.error);
+        setPrograms([]);
+      }
+    } catch (err) {
+      console.error('Error fetching programs:', err);
+      setPrograms([]);
+    }
+  };  // Initialize map
+  useEffect(() => {
+    if (!mapRef.current || mapInstanceRef.current) return;
+
+    try {
+      mapInstanceRef.current = L.map(mapRef.current, {
+        center: [-6.200000, 106.816666],
+        zoom: 10,
+        maxZoom: 18,
+        preferCanvas: true // Use Canvas renderer for better performance
+      });
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(mapInstanceRef.current);
+
+      markersLayerRef.current = L.layerGroup().addTo(mapInstanceRef.current);
+      // Trigger a resize when the map container becomes visible
+      const resizeObserver = new ResizeObserver(() => {
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.invalidateSize();
+        }
+      });
+      
+      resizeObserver.observe(mapRef.current);
+
+      return () => {
+        resizeObserver.disconnect();
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.remove();
+          mapInstanceRef.current = null;
+        }
+      };
+    } catch (error) {
+      console.error('Error initializing map:', error);
+    }
+  }, []);
+
+  // Update markers when programs or filter changes
+  useEffect(() => {
+    if (!mapInstanceRef.current || !markersLayerRef.current) return;
+
+    markersLayerRef.current.clearLayers();
+
+    const filteredPrograms = programs.filter(program => {
+      if (filter === 'active') return program.status === 'active';
+      if (filter === 'inactive') return program.status === 'inactive';
+      return true;
+    });
+
+    filteredPrograms.forEach(program => {
+      if (program.latitude && program.longitude) {
+        const marker = L.marker([program.latitude, program.longitude])
+          .bindPopup(`
+            <div>
+              <h3 class="font-bold">${program.title}</h3>
+              <p class="text-sm">${program.status === 'active' ? 'Aktif' : 'Tidak Aktif'}</p>
+              <p class="text-sm">Target: Rp ${formatCurrency(program.target)}</p>
+            </div>
+          `);
+        markersLayerRef.current.addLayer(marker);
+      }
+    });
+  }, [programs, filter]);
+
+  // Fetch initial data
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getStatistics();
-        setStatistics(response.data);
+        const [statsResponse] = await Promise.all([
+          getStatistics(),
+          fetchPrograms()
+        ]);
+        setStatistics(statsResponse.data);
         setLoading(false);
       } catch (err) {
-        setError("Gagal memuat data statistik");
+        setError("Gagal memuat data");
         setLoading(false);
       }
     };
@@ -135,7 +238,7 @@ const Dashboard = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {stats.map((stat, index) => (
             <div key={index} className="bg-white rounded-lg shadow-md p-6">
               <div className="flex items-center justify-between mb-4">
@@ -149,6 +252,33 @@ const Dashboard = () => {
               </div>
             </div>
           ))}
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold">Peta Program</h2>
+            <div className="flex gap-2">
+              <select
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option value="all">Semua Program</option>
+                <option value="active">Program Aktif</option>
+                <option value="inactive">Program Tidak Aktif</option>
+              </select>
+            </div>
+          </div>          <div 
+            ref={mapRef} 
+            className="w-full h-[500px] rounded-lg relative"
+            style={{ zIndex: 0 }}
+          >
+            {!mapInstanceRef.current && (
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                <p>Loading map...</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </animated.div>

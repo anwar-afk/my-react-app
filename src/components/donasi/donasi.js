@@ -1,8 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { getCampaigns } from '../../services/campaignService'; // Updated import
 import { useSpring, animated } from "@react-spring/web";
 import { useInView } from "react-intersection-observer";
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+// Set default icon for Leaflet markers
+const DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+L.Marker.prototype.options.icon = DefaultIcon;
 
 const baseUrl = "http://localhost:5000";
 
@@ -39,7 +54,22 @@ export const DonasiContent = () => {
   const [showAll, setShowAll] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedCategories, setSelectedCategories] = useState({});
+  const [mapInstance, setMapInstance] = useState(null);
+  const [markersLayer, setMarkersLayer] = useState(null);
+  const mapRef = useRef(null);
+  
   const categories = ["bencana alam", "pendidikan", "kesehatan", "kemanusiaan", "lingkungan", "lainnya"];
+
+
+  // Initialize category checkboxes
+  useEffect(() => {
+    const initialCategories = categories.reduce((acc, cat) => {
+      acc[cat] = true;
+      return acc;
+    }, {});
+    setSelectedCategories(initialCategories);
+  }, []);
 
   useEffect(() => {
     const fetchCampaigns = async () => {
@@ -66,24 +96,80 @@ export const DonasiContent = () => {
 
     fetchCampaigns();
   }, []);
+  // Initialize map
+  useEffect(() => {
+    if (!mapRef.current || mapInstance) return;
+
+    const timer = setTimeout(() => {
+      console.log("🗺️ Initializing map...");
+      const map = L.map(mapRef.current).setView([-6.200000, 106.816666], 5);
+
+      // Add tile layer
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+    
+      setMapInstance(map);
+      setMarkersLayer(L.layerGroup().addTo(map));
+
+      // Force a resize after a small delay to ensure proper rendering
+      setTimeout(() => {
+        map.invalidateSize();
+      }, 100);
+    }, 3000); // 3 second delay
+
+    return () => {
+      clearTimeout(timer);
+      if (mapInstance) {
+        mapInstance.remove();
+        console.log("🗺️ Map cleaned up");
+      }
+    };
+  }, []);
+
+  // Update markers when campaigns or filters change
+  useEffect(() => {
+    if (!mapInstance || !markersLayer) return;
+
+    markersLayer.clearLayers();
+
+    const filteredCampaigns = campaigns.filter(campaign => {
+      const normalizedCategory = campaign.category?.replace(/_/g, ' ');
+      return selectedCategories[normalizedCategory];
+    });
+
+    filteredCampaigns.forEach(campaign => {
+      if (campaign.latitude && campaign.longitude) {
+        const marker = L.marker([campaign.latitude, campaign.longitude])
+          .bindPopup(`
+            <div class="text-center">
+              <h3 class="font-bold">${campaign.title}</h3>
+              <p class="text-sm">${campaign.category}</p>
+              <a href="/donation/${campaign.id}" class="text-green-500 hover:underline">Lihat Detail</a>
+            </div>
+          `);
+        markersLayer.addLayer(marker);
+      }
+    });
+  }, [campaigns, selectedCategories, mapInstance]);
+
+  const handleCategoryChange = (category) => {
+    setSelectedCategories(prev => ({
+      ...prev,
+      [category]: !prev[category]
+    }));
+  };
 
   const filteredCampaigns = React.useMemo(() => {
     if (!Array.isArray(campaigns)) return [];
     
     return campaigns.filter((campaign) => {
       if (!campaign) return false;
-      
-      // Normalize category name by replacing underscores with spaces
       const normalizedCategory = campaign.category?.replace(/_/g, ' ');
-      const isValidCategory = selectedCategory === "all" || normalizedCategory === selectedCategory;
-      
-      // Check if campaign is still active
-      const endDate = new Date(campaign.endDate);
-      const isActive = !isNaN(endDate.getTime()) && endDate > new Date();
-      
-      return isValidCategory && isActive;
+      return selectedCategories[normalizedCategory];
     });
-  }, [campaigns, selectedCategory]);
+  }, [campaigns, selectedCategories]);
 
   if (loading) return <div className="text-center py-10">Loading...</div>;
   if (error) return <div className="text-center py-10 text-red-600">Error: {error}</div>;
@@ -94,33 +180,48 @@ export const DonasiContent = () => {
       <h1 className="text-4xl lg:text-5xl font-normal text-green-500 mb-10 mt-20">
         Mari Bantu <span className="font-semibold">Mereka</span>
       </h1>
-      <div className="flex justify-between items-center mb-10">
-        <h2 className="text-2xl lg:text-3xl font-bold text-gray-800">Donasi</h2>
-        <select 
-          value={selectedCategory} 
-          onChange={(e) => setSelectedCategory(e.target.value)} 
-          className="px-4 py-2 border border-gray-300 rounded-lg"
-        >
-          <option value="all">Semua Kategori</option>
-          {categories.map((category) => (
-            <option key={category} value={category}>{category}</option>
-          ))}
-        </select>
+
+      {/* Map Section */}
+      <div className="mb-10">
+        <h2 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-4">Lokasi Program</h2>
+        <div className="bg-white rounded-lg shadow-md p-4">
+          <div className="mb-4">
+            <h3 className="font-semibold mb-2">Filter Kategori:</h3>
+            <div className="flex flex-wrap gap-4">
+              {categories.map((category) => (
+                <label key={category} className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={selectedCategories[category]}
+                    onChange={() => handleCategoryChange(category)}
+                    className="form-checkbox h-4 w-4 text-green-500"
+                  />
+                  <span className="text-gray-700">{category}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          <div ref={mapRef} className="w-full h-[400px] rounded-lg" />
+        </div>
       </div>
-      
-      {filteredCampaigns.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredCampaigns
-            .slice(0, showAll ? filteredCampaigns.length : 4)
-            .map((campaign) => (
-              <CampaignCard key={campaign.id || campaign._id} campaign={campaign} />
-            ))}
-        </div>
-      ) : (
-        <div className="text-center py-10">
-          Tidak ada campaign dalam kategori ini
-        </div>
-      )}
+
+      {/* Campaign Cards Section */}
+      <div className="mb-10">
+        <h2 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-4">Program Donasi</h2>
+        {filteredCampaigns.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredCampaigns
+              .slice(0, showAll ? filteredCampaigns.length : 4)
+              .map((campaign) => (
+                <CampaignCard key={campaign.id || campaign._id} campaign={campaign} />
+              ))}
+          </div>
+        ) : (
+          <div className="text-center py-10">
+            Tidak ada campaign dalam kategori ini
+          </div>
+        )}
+      </div>
 
       {filteredCampaigns.length > 4 && (
         <div className="flex justify-center mt-10">
