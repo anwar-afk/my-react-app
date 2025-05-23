@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
-import { getStatistics } from "../../../services/statisticsService";
-import { useSpring, animated } from "@react-spring/web";
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { getStatistics } from "../../../services/statisticsService";
+import { useSpring, animated } from "@react-spring/web";
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import { getCampaigns } from '../../../services/campaignService';
@@ -12,7 +12,8 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [programs, setPrograms] = useState([]);
-  const [filter, setFilter] = useState('all'); // 'all', 'active', 'inactive'
+  const [filter, setFilter] = useState('all');
+  const [mapInitialized, setMapInitialized] = useState(false);
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markersLayerRef = useRef(null);
@@ -24,21 +25,24 @@ const Dashboard = () => {
   });
 
   // Set default icon for markers
-  const DefaultIcon = L.icon({
-    iconUrl: icon,
-    shadowUrl: iconShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-  });
-  L.Marker.prototype.options.icon = DefaultIcon;  // Fetch programs data
+  useEffect(() => {
+    const DefaultIcon = L.icon({
+      iconUrl: icon,
+      shadowUrl: iconShadow,
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41]
+    });
+    L.Marker.prototype.options.icon = DefaultIcon;
+  }, []);
+
+  // Fetch programs data
   const fetchPrograms = async () => {
     try {
       const result = await getCampaigns();
       if (result.success) {
         setPrograms(result.campaigns);
-        console.log('Fetched programs:', result.campaigns); // For debugging
       } else {
         console.error('Error fetching programs:', result.error);
         setPrograms([]);
@@ -47,43 +51,47 @@ const Dashboard = () => {
       console.error('Error fetching programs:', err);
       setPrograms([]);
     }
-  };  // Initialize map
+  };
+
+  // Initialize map
   useEffect(() => {
-    if (!mapRef.current || mapInstanceRef.current) return;
+    if (!mapRef.current || mapInstanceRef.current || !statistics) return;
 
-    try {
-      mapInstanceRef.current = L.map(mapRef.current, {
-        center: [-6.200000, 106.816666],
-        zoom: 10,
-        maxZoom: 18,
-        preferCanvas: true // Use Canvas renderer for better performance
-      });
+    const initializeMap = () => {
+      try {
+        console.log("🗺️ Initializing map...");
+        const map = L.map(mapRef.current).setView([-6.200000, 106.816666], 5);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(mapInstanceRef.current);
+        mapInstanceRef.current = map;
+        markersLayerRef.current = L.layerGroup().addTo(map);
 
-      markersLayerRef.current = L.layerGroup().addTo(mapInstanceRef.current);
-      // Trigger a resize when the map container becomes visible
-      const resizeObserver = new ResizeObserver(() => {
-        if (mapInstanceRef.current) {
-          mapInstanceRef.current.invalidateSize();
-        }
-      });
-      
-      resizeObserver.observe(mapRef.current);
+        // Force a resize after initialization
+        requestAnimationFrame(() => {
+          map.invalidateSize();
+          setMapInitialized(true);
+        });
+      } catch (error) {
+        console.error('Error initializing map:', error);
+      }
+    };
 
-      return () => {
-        resizeObserver.disconnect();
-        if (mapInstanceRef.current) {
-          mapInstanceRef.current.remove();
-          mapInstanceRef.current = null;
-        }
-      };
-    } catch (error) {
-      console.error('Error initializing map:', error);
-    }
-  }, []);
+    // Initialize map after a short delay to ensure the container is ready
+    const timer = setTimeout(initializeMap, 100);
+
+    return () => {
+      clearTimeout(timer);
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+        markersLayerRef.current = null;
+        setMapInitialized(false);
+      }
+    };
+  }, [statistics]); // Add statistics as dependency to ensure map initializes after data is loaded
 
   // Update markers when programs or filter changes
   useEffect(() => {
@@ -268,17 +276,21 @@ const Dashboard = () => {
                 <option value="inactive">Program Tidak Aktif</option>
               </select>
             </div>
-          </div>          <div 
+          </div>
+          <div 
             ref={mapRef} 
             className="w-full h-[500px] rounded-lg relative"
-            style={{ zIndex: 0 }}
-          >
-            {!mapInstanceRef.current && (
-              <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-                <p>Loading map...</p>
-              </div>
-            )}
-          </div>
+            style={{ 
+              minHeight: "500px",
+              opacity: mapInitialized ? 1 : 0,
+              transition: 'opacity 0.3s ease-in-out'
+            }}
+          />
+          {!mapInitialized && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+              <p className="text-gray-600">Initializing map...</p>
+            </div>
+          )}
         </div>
       </div>
     </animated.div>

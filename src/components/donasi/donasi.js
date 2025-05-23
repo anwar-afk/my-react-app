@@ -96,37 +96,33 @@ export const DonasiContent = () => {
 
     fetchCampaigns();
   }, []);
+  
+  
   // Initialize map
   useEffect(() => {
     if (!mapRef.current || mapInstance) return;
 
-    const timer = setTimeout(() => {
-      console.log("🗺️ Initializing map...");
-      const map = L.map(mapRef.current).setView([-6.200000, 106.816666], 5);
+    console.log("🗺️ Initializing map...");
+    const map = L.map(mapRef.current).setView([-6.200000, 106.816666], 5);
 
-      // Add tile layer
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(map);
+    // Add tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
 
-    
-      setMapInstance(map);
-      setMarkersLayer(L.layerGroup().addTo(map));
+    setMapInstance(map);
+    setMarkersLayer(L.layerGroup().addTo(map));
 
-      // Force a resize after a small delay to ensure proper rendering
-      setTimeout(() => {
-        map.invalidateSize();
-      }, 100);
-    }, 3000); // 3 second delay
+    // Force a resize to ensure proper rendering
+    map.invalidateSize();
 
     return () => {
-      clearTimeout(timer);
-      if (mapInstance) {
-        mapInstance.remove();
+      if (map) {
+        map.remove();
         console.log("🗺️ Map cleaned up");
       }
     };
-  }, []);
+  }, [mapRef.current]); // Add mapRef.current as a dependency
 
   // Update markers when campaigns or filters change
   useEffect(() => {
