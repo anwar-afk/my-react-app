@@ -1,15 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSpring, animated } from "@react-spring/web";
 import Swal from "sweetalert2";
 import axios from "axios";
 
 const LaporanKeuangan = () => {
-  const [laporan, setLaporan] = useState([]); // mulai dari array kosong
+  const [laporan, setLaporan] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({
     title: "",
     tanggal: "",
-    pdf: null, // ganti dari 'file' ke 'pdf'
+    pdf: null,
   });
 
   const fadeIn = useSpring({
@@ -17,6 +17,25 @@ const LaporanKeuangan = () => {
     to: { opacity: 1, transform: "translateY(0)" },
     config: { duration: 250 },
   });
+
+  // Ambil data laporan dari API saat mount
+  useEffect(() => {
+    const fetchLaporan = async () => {
+      const token = localStorage.getItem("token");
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/api/documents",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setLaporan(response.data.documents || response.data); // sesuaikan dengan struktur respons
+      } catch (err) {
+        Swal.fire("Error", "Gagal memuat data laporan", "error");
+      }
+    };
+    fetchLaporan();
+  }, []);
 
   const openModal = () => {
     setForm({ title: "", tanggal: "", pdf: null });
@@ -42,8 +61,8 @@ const LaporanKeuangan = () => {
     const formData = new FormData();
     formData.append("title", form.title);
     formData.append("pdf", form.pdf); // field harus 'pdf'
-    // Jika backend butuh tanggal, tambahkan juga:
-    formData.append("tanggal", form.tanggal);
+    // Kirim tanggal mulai ke field reportDate di backend
+    formData.append("reportDate", form.tanggal); // pastikan field ini dikirim sebagai 'reportDate'
     const token = localStorage.getItem("token");
     if (!token) {
       Swal.fire(
@@ -67,15 +86,11 @@ const LaporanKeuangan = () => {
       setLaporan([
         ...laporan,
         {
-          id: data.id || Date.now(),
+          id: data.id || data._id || Date.now(),
           title: data.title || form.title,
-          tanggal: form.tanggal,
-          dibuat: new Date().toLocaleDateString("id-ID", {
-            day: "2-digit",
-            month: "long",
-            year: "numeric",
-          }),
-          // bisa tambahkan data.filepath jika ingin preview/download
+          reportDate: data.reportDate || form.tanggal, // ambil dari backend
+          createdAt: data.createdAt || new Date().toISOString(), // ambil dari backend
+          // tambahkan field lain jika perlu
         },
       ]);
       setShowModal(false);
@@ -103,8 +118,20 @@ const LaporanKeuangan = () => {
       cancelButtonText: "Batal",
     });
     if (result.isConfirmed) {
-      setLaporan(laporan.filter((item) => item.id !== id));
-      Swal.fire("Dihapus!", "Laporan berhasil dihapus.", "success");
+      const token = localStorage.getItem("token");
+      try {
+        await axios.delete(`http://localhost:5000/api/documents/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setLaporan(laporan.filter((item) => (item.id || item._id) !== id));
+        Swal.fire("Dihapus!", "Laporan berhasil dihapus.", "success");
+      } catch (err) {
+        let msg = "Gagal menghapus laporan. Pastikan Anda admin & token valid.";
+        if (err.response && err.response.data && err.response.data.message) {
+          msg = err.response.data.message;
+        }
+        Swal.fire("Error", msg, "error");
+      }
     }
   };
 
@@ -125,24 +152,79 @@ const LaporanKeuangan = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {laporan.map((item) => (
                 <div
-                  key={item.id}
+                  key={item.id || item._id}
                   className="bg-white rounded-lg shadow p-4 flex flex-col justify-between"
                 >
                   <div>
                     <h2 className="text-sm font-semibold mb-2">{item.title}</h2>
                     <p className="text-xs text-gray-600 mb-1">
-                      Tanggal: {item.tanggal}
+                      Tanggal laporan:{" "}
+                      {item.reportDate
+                        ? new Date(item.reportDate).toLocaleDateString(
+                            "id-ID",
+                            {
+                              day: "2-digit",
+                              month: "long",
+                              year: "numeric",
+                            }
+                          )
+                        : "-"}
                     </p>
                     <p className="text-xs text-gray-600 mb-4">
-                      Dibuat pada: {item.dibuat}
+                      Dibuat pada:{" "}
+                      {item.createdAt
+                        ? new Date(item.createdAt).toLocaleDateString("id-ID", {
+                            day: "2-digit",
+                            month: "long",
+                            year: "numeric",
+                          })
+                        : "-"}
                     </p>
                   </div>
-                  <button
-                    onClick={() => handleDelete(item.id)}
-                    className="px-4 py-1 bg-gray-100 text-gray-700 rounded border border-gray-300 hover:bg-red-100 hover:text-red-600 transition"
-                  >
-                    Hapus
-                  </button>
+                  <div className="flex gap-2">
+                    <a
+                      href={`http://localhost:5000/api/documents/download/${
+                        item.id || item._id
+                      }`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-1 bg-green-100 text-green-700 rounded border border-green-300 hover:bg-green-200 transition text-sm"
+                      onClick={(e) => {
+                        // Cek jika file tidak ditemukan, tampilkan alert error
+                        fetch(
+                          `http://localhost:5000/api/documents/download/${
+                            item.id || item._id
+                          }`
+                        )
+                          .then((res) => {
+                            if (!res.ok) {
+                              e.preventDefault();
+                              Swal.fire(
+                                "Error",
+                                "File tidak ditemukan di server.",
+                                "error"
+                              );
+                            }
+                          })
+                          .catch(() => {
+                            e.preventDefault();
+                            Swal.fire(
+                              "Error",
+                              "Terjadi kesalahan saat mengunduh file.",
+                              "error"
+                            );
+                          });
+                      }}
+                    >
+                      Download
+                    </a>
+                    <button
+                      onClick={() => handleDelete(item.id || item._id)}
+                      className="px-4 py-1 bg-gray-100 text-gray-700 rounded border border-gray-300 hover:bg-red-100 hover:text-red-600 transition text-sm"
+                    >
+                      Hapus
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

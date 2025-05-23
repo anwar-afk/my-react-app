@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSpring, animated } from "@react-spring/web";
+import axios from "axios";
 
 const LaporanKeuangan = () => {
   const [showMore, setShowMore] = useState(false);
+  const [reports, setReports] = useState([]);
 
   const fadeIn = useSpring({
     from: { opacity: 0, transform: "translateY(20px)" },
@@ -10,18 +12,18 @@ const LaporanKeuangan = () => {
     config: { duration: 250 }, // durasi animasi dipercepat menjadi 250ms
   });
 
-  // Sample data for financial reports
-  // In the future, this would come from an API
-  const reports = [
-    { id: 1, year: "2024", pdfUrl: "#" },
-    { id: 2, year: "2023", pdfUrl: "#" },
-    { id: 3, year: "2023", pdfUrl: "#" },
-    { id: 4, year: "2022", pdfUrl: "#" },
-    { id: 5, year: "2021", pdfUrl: "#" },
-    { id: 6, year: "2020", pdfUrl: "#" },
-    { id: 7, year: "2019", pdfUrl: "#" },
-    { id: 8, year: "2018", pdfUrl: "#" },
-  ];
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/documents");
+        // Sesuaikan dengan struktur respons backend
+        setReports(res.data.documents || res.data);
+      } catch (err) {
+        setReports([]);
+      }
+    };
+    fetchReports();
+  }, []);
 
   // Display only first 6 reports initially
   const visibleReports = showMore ? reports : reports.slice(0, 6);
@@ -38,18 +40,27 @@ const LaporanKeuangan = () => {
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {visibleReports.length === 0 && (
+            <div className="col-span-3 text-center text-gray-500">
+              Belum ada laporan.
+            </div>
+          )}
           {visibleReports.map((report) => (
             <div
-              key={report.id}
+              key={report.id || report._id}
               className="bg-white rounded-lg shadow-md overflow-hidden"
             >
               <div className="p-6">
                 <h3 className="text-lg font-medium text-gray-800 mb-4">
-                  Tahun {report.year}
+                  {report.title || `Tahun ${report.year || "-"}`}
                 </h3>
                 <a
-                  href={report.pdfUrl}
+                  href={`http://localhost:5000/api/documents/download/${
+                    report.id || report._id
+                  }`}
                   className="w-full flex items-center justify-center py-3 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors duration-300"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   <span>Unduh pdf</span>
                   <svg
