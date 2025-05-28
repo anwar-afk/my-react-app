@@ -94,6 +94,7 @@ const RegisterPage = () => {
           />
           <div className="relative">
             <input
+              placeholder="Password"
               name="password"
               type={showPassword ? "text" : "password"}
               required
@@ -162,6 +163,7 @@ const RegisterPage = () => {
           </div>
           <div className="relative mt-4">
             <input
+              placeholder="Confirm Password"
               name="confirmPassword"
               type={showConfirmPassword ? "text" : "password"}
               required

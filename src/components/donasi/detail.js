@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { useSpring, animated } from "@react-spring/web";
 import { getCampaigns } from "../../services/campaignService";
 import { AuthContext } from "../../context/AuthContext";
-import { createDonation } from "../../services/donateService";
+import { createDonation, getCampaignDonationHistory } from "../../services/donateService";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -25,6 +25,8 @@ const DonationDetailPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [amount, setAmount] = useState("");
   const [donationError, setDonationError] = useState(null);
+  const [donationHistory, setDonationHistory] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(true);
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markerRef = useRef(null);
@@ -77,6 +79,29 @@ const DonationDetailPage = () => {
 
     fetchData();
   }, [id]);
+
+  // Fetch donation history
+  useEffect(() => {
+    const fetchDonationHistory = async () => {
+      try {
+        if (campaign && user) {
+          const history = await getCampaignDonationHistory(id);
+          if (Array.isArray(history)) {
+            setDonationHistory(history);
+          } else {
+            console.error("Unexpected donation history format:", history);
+            setDonationHistory([]);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching donation history:", error);
+      } finally {
+        setLoadingHistory(false);
+      }
+    };
+
+    fetchDonationHistory();
+  }, [campaign, user, id]);
 
   // Initialize map when campaign data is available
   useEffect(() => {
@@ -271,6 +296,65 @@ const DonationDetailPage = () => {
             style={{ minHeight: "400px" }}
           />
         </div>
+
+        {/* Donation History Section */}
+        {user && (
+          <div className="mt-8 bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">
+              Riwayat Donasi
+            </h3>
+            {loadingHistory ? (
+              <p className="text-gray-600">Memuat riwayat donasi...</p>
+            ) : donationHistory.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-gray-50">
+                      <th className="px-4 py-2 text-left">Jumlah Donasi</th>
+                      <th className="px-4 py-2 text-left">Status</th>
+                      <th className="px-4 py-2 text-left">Tanggal</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {donationHistory.map((donation) => (
+                      <tr key={donation._id} className="border-t">
+                        <td className="px-4 py-2">
+                          Rp {donation.amount.toLocaleString("id-ID")}
+                        </td>
+                        <td className="px-4 py-2">
+                          <span
+                            className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${
+                              donation.paymentStatus === "success"
+                                ? "bg-green-100 text-green-800"
+                                : donation.paymentStatus === "pending"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : "bg-red-100 text-red-800"
+                            }`}
+                          >
+                            {donation.paymentStatus === "success"
+                              ? "Berhasil"
+                              : donation.paymentStatus === "pending"
+                              ? "Menunggu"
+                              : "Gagal"}
+                          </span>
+                        </td>
+                        <td className="px-4 py-2">
+                          {new Date(donation.createdAt).toLocaleDateString("id-ID", {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          })}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="text-gray-600">Belum ada riwayat donasi untuk campaign ini.</p>
+            )}
+          </div>
+        )}
       </main>
 
       {/* Donation Modal */}

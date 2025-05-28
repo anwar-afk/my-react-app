@@ -98,11 +98,7 @@ const ProgramForm = ({ programData, onSubmit, onCancel }) => {
         // Event handler untuk klik pada peta
         mapInstanceRef.current.on("click", (e) => {
           const { lat, lng } = e.latlng;
-          if (
-            markerRef.current &&
-            typeof lat === "number" &&
-            typeof lng === "number"
-          ) {
+          if (markerRef.current && typeof lat === "number" && typeof lng === "number") {
             markerRef.current.setLatLng([lat, lng]);
             setLatitude(lat);
             setLongitude(lng);
@@ -112,11 +108,7 @@ const ProgramForm = ({ programData, onSubmit, onCancel }) => {
         // Event handler untuk drag marker
         markerRef.current.on("dragend", (e) => {
           const position = e.target.getLatLng();
-          if (
-            position &&
-            typeof position.lat === "number" &&
-            typeof position.lng === "number"
-          ) {
+          if (position && typeof position.lat === "number" && typeof position.lng === "number") {
             setLatitude(position.lat);
             setLongitude(position.lng);
           }
@@ -127,8 +119,11 @@ const ProgramForm = ({ programData, onSubmit, onCancel }) => {
 
         // Pastikan ukuran peta terupdate dengan benar
         setTimeout(() => {
-          mapInstanceRef.current?.invalidateSize();
+          if (mapInstanceRef.current) {
+            mapInstanceRef.current.invalidateSize();
+          }
         }, 250);
+
       } catch (error) {
         console.error("Error initializing map:", error);
       }
@@ -142,7 +137,7 @@ const ProgramForm = ({ programData, onSubmit, onCancel }) => {
       clearTimeout(timeoutId);
       cleanupMap();
     };
-  }, []); // Empty dependency array karena kita hanya ingin ini berjalan sekali
+  }, [mapContainerRef.current]); // Hapus latitude dan longitude dari dependencies
 
   // Effect untuk update posisi marker ketika koordinat berubah
   useEffect(() => {
@@ -454,10 +449,10 @@ const ProgramForm = ({ programData, onSubmit, onCancel }) => {
             <div>
               <label className="block text-gray-700 text-sm font-bold mb-2">
                 Pilih Koordinat (Klik pada peta atau geser marker)
-              </label>
-              <div
+              </label>              <div
                 ref={mapContainerRef}
                 className="w-full h-[300px] rounded-lg shadow-md mb-2"
+                style={{ minHeight: "300px", position: "relative", zIndex: 1 }}
               />
               <div className="grid grid-cols-2 gap-4">
                 <div>

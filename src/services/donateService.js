@@ -69,3 +69,41 @@ export const getDonationHistory = async () => {
     return { error: "Terjadi kesalahan server. Silakan coba lagi." };
   }
 };
+
+// ✅ Function to fetch donation history for specific campaign
+export const getCampaignDonationHistory = async (campaignId) => {
+  try {
+    const token = localStorage.getItem('token'); // ✅ Get auth token
+    if (!token) {
+      console.warn("⚠️ No authentication token found!");
+      return { error: "User not logged in." };
+    }
+
+    const response = await axios.get(`${baseUrl}/donations/history`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // ✅ Include token for authentication
+      },
+    });
+
+    console.log("✅ Campaign donation history response:", response.data);
+
+    if (response.data && Array.isArray(response.data)) {
+      // Filter donations for the specific campaign
+      const campaignDonations = response.data.filter(
+        donation => donation.campaignId === parseInt(campaignId)
+      );
+      return campaignDonations;
+    } else {
+      console.error("🚨 Unexpected response format:", response.data);
+      return [];
+    }
+  } catch (error) {
+    console.error("❌ Error fetching campaign donation history:", error);
+    
+    if (error.response) {
+      console.error("Server response:", error.response.data);
+    }
+
+    return { error: "Terjadi kesalahan server. Silakan coba lagi." };
+  }
+};

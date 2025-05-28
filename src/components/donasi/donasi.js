@@ -97,18 +97,28 @@ export const DonasiContent = () => {
     fetchCampaigns();
   }, []);
   
-  
-  // Initialize map
+    // Initialize map
   useEffect(() => {
     if (!mapRef.current || mapInstance) return;
 
     console.log("🗺️ Initializing map...");
+    
+    // Create map instance
     const map = L.map(mapRef.current).setView([-6.200000, 106.816666], 5);
 
     // Add tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
+
+    // Set map instance and create markers layer
+    setMapInstance(map);
+    setMarkersLayer(L.layerGroup().addTo(map));
+
+    // Force a resize to ensure proper rendering
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 100);
 
     setMapInstance(map);
     setMarkersLayer(L.layerGroup().addTo(map));
@@ -197,7 +207,7 @@ export const DonasiContent = () => {
               ))}
             </div>
           </div>
-          <div ref={mapRef} className="w-full h-[400px] rounded-lg" />
+          <div ref={mapRef} style={{ width: '100%', height: '400px' }} className="w-full rounded-lg border border-gray-200" />
         </div>
       </div>
 
